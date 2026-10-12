@@ -33,11 +33,11 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-    <!-- Top Navbar -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+    <!-- Top Navbar (Diperbaiki z-index dan posisinya agar bisa diklik) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center relative z-50">
             <div class="flex items-center space-x-3">
-                <button id="sidebarToggle" class="text-slate-600 hover:text-indigo-600 focus:outline-none p-2 rounded-lg hover:bg-slate-100 transition">
+                <button id="sidebarToggle" class="relative z-50 text-slate-600 hover:text-indigo-600 focus:outline-none p-2 rounded-lg hover:bg-slate-100 transition cursor-pointer">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <div class="flex items-center space-x-2">
@@ -49,16 +49,16 @@
             </div>
 
             <!-- Tombol Header: Refresh, Tambah Barang, Export/Import Excel -->
-            <div class="flex items-center space-x-2 sm:space-x-3">
-                <button onclick="refreshDataSmart()" title="Refresh Data Terbaru" class="flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium transition">
+            <div class="flex items-center space-x-2 sm:space-x-3 relative z-50">
+                <button onclick="refreshDataSmart()" title="Refresh Data Terbaru" class="flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer">
                     <i class="fa-solid fa-rotate"></i>
                     <span class="hidden sm:inline">Refresh</span>
                 </button>
-                <button onclick="openModalBarang()" class="flex items-center space-x-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-sm transition">
+                <button onclick="openModalBarang()" class="flex items-center space-x-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-sm transition cursor-pointer">
                     <i class="fa-solid fa-plus"></i>
                     <span>Barang Baru</span>
                 </button>
-                <button onclick="exportToExcel()" title="Export Excel Multi-Sheet" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-sm transition">
+                <button onclick="exportToExcel()" title="Export Excel Multi-Sheet" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-sm transition cursor-pointer">
                     <i class="fa-solid fa-file-excel"></i>
                     <span class="hidden sm:inline">Export Excel</span>
                 </button>
@@ -80,7 +80,7 @@
                 <h2 class="font-bold text-slate-800 flex items-center gap-2">
                     <i class="fa-solid fa-gear text-indigo-600"></i> Pengaturan & Menu
                 </h2>
-                <button id="sidebarClose" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                <button id="sidebarClose" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -93,7 +93,7 @@
                     <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Konfigurasi Firebase</h3>
                     <p class="text-xs text-slate-500">Masukkan konfigurasi Firebase Database untuk sinkronisasi real-time.</p>
                     <textarea id="firebaseConfigInput" rows="4" placeholder="Paste objek konfigurasi Firebase di sini..." class="w-full text-xs font-mono p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
-                    <button onclick="saveFirebaseConfig()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold py-2 rounded-lg transition shadow-sm">
+                    <button onclick="saveFirebaseConfig()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold py-2 rounded-lg transition shadow-sm cursor-pointer">
                         Simpan & Hubungkan Firebase
                     </button>
                     <div id="firebaseStatus" class="text-xs text-center font-medium py-1 px-2 rounded bg-amber-50 text-amber-700 border border-amber-200">
@@ -107,7 +107,7 @@
                 <div class="space-y-3">
                     <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Cadangan Data (JSON)</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="exportJSON()" class="flex items-center justify-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2 px-3 rounded-lg border border-slate-300 transition">
+                        <button onclick="exportJSON()" class="flex items-center justify-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2 px-3 rounded-lg border border-slate-300 transition cursor-pointer">
                             <i class="fa-solid fa-download"></i> <span>Export JSON</span>
                         </button>
                         <label class="cursor-pointer flex items-center justify-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium py-2 px-3 rounded-lg border border-slate-300 transition text-center">
@@ -123,10 +123,10 @@
                 <div class="space-y-3">
                     <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Aksi Cepat</h3>
                     <div class="space-y-2">
-                        <button onclick="shareAppLink()" class="w-full flex items-center justify-center space-x-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium py-2 px-3 rounded-lg border border-indigo-200 transition">
+                        <button onclick="shareAppLink()" class="w-full flex items-center justify-center space-x-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium py-2 px-3 rounded-lg border border-indigo-200 transition cursor-pointer">
                             <i class="fa-solid fa-share-nodes"></i> <span>Share Link Aplikasi</span>
                         </button>
-                        <button onclick="downloadAppHTML()" class="w-full flex items-center justify-center space-x-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-medium py-2 px-3 rounded-lg border border-emerald-200 transition">
+                        <button onclick="downloadAppHTML()" class="w-full flex items-center justify-center space-x-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-medium py-2 px-3 rounded-lg border border-emerald-200 transition cursor-pointer">
                             <i class="fa-solid fa-code"></i> <span>Download File Program (.html)</span>
                         </button>
                     </div>
@@ -246,7 +246,7 @@
                 <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-box-archive text-indigo-600"></i> Tambah Barang Baru
                 </h3>
-                <button onclick="closeModalBarang()" class="text-slate-400 hover:text-slate-600">
+                <button onclick="closeModalBarang()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -270,8 +270,8 @@
                     </div>
                 </div>
                 <div class="pt-3 flex justify-end space-x-2">
-                    <button type="button" onclick="closeModalBarang()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition shadow-sm">Simpan Barang</button>
+                    <button type="button" onclick="closeModalBarang()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition cursor-pointer">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition shadow-sm cursor-pointer">Simpan Barang</button>
                 </div>
             </form>
         </div>
@@ -284,7 +284,7 @@
                 <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-file-pen text-indigo-600"></i> Tambah Transaksi Kartu Stok
                 </h3>
-                <button onclick="closeModalTransaksi()" class="text-slate-400 hover:text-slate-600">
+                <button onclick="closeModalTransaksi()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -325,8 +325,8 @@
                 </div>
 
                 <div class="pt-3 flex justify-end space-x-2">
-                    <button type="button" onclick="closeModalTransaksi()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition shadow-sm">Simpan Transaksi</button>
+                    <button type="button" onclick="closeModalTransaksi()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition cursor-pointer">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition shadow-sm cursor-pointer">Simpan Transaksi</button>
                 </div>
             </form>
         </div>
@@ -336,7 +336,7 @@
     <script>
         // --- State Aplikasi ---
         let appData = {
-            barang: {} // Format: { barangId: { info: {nama, asal, kode, satuan}, transaksi: [...] } }
+            barang: {}
         };
 
         let firebaseConfig = null;
@@ -385,7 +385,6 @@
                     appData = { barang: {} };
                 }
             } else {
-                // Data Dummy Awal jika kosong
                 appData = {
                     barang: {
                         "barang_1": {
@@ -411,7 +410,7 @@
             renderAll();
         }
 
-        // --- Refresh Cerdas (Tidak mereset ke awal, reload data terbaru) ---
+        // --- Refresh Cerdas ---
         function refreshDataSmart() {
             const btn = document.querySelector('button[onclick="refreshDataSmart()"]');
             const icon = btn.querySelector('i');
@@ -448,7 +447,6 @@
 
         function initFirebase(configStr) {
             try {
-                // Evaluasi objek config
                 let config;
                 eval("config = " + configStr);
                 
@@ -461,14 +459,12 @@
                 document.getElementById('firebaseStatus').className = "text-xs text-center font-medium py-1 px-2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200";
                 document.getElementById('firebaseStatus').innerText = "Status: Terhubung ke Firebase (Realtime)";
 
-                // Realtime Listener
                 db.ref('stok_app_data').on('value', (snapshot) => {
                     const serverData = snapshot.val();
                     if (serverData && serverData.barang) {
                         appData = serverData;
                         renderAll();
                     } else {
-                        // Jika di server kosong, push data lokal ke server
                         db.ref('stok_app_data').set(appData);
                     }
                 });
@@ -481,14 +477,13 @@
             }
         }
 
-        // --- Render Seluruh UI ---
+        // --- Render UI ---
         function renderAll() {
             renderDashboardStats();
             renderStokBarangTable();
             renderVendorPanels();
         }
 
-        // --- 1. Dashboard Interaktif ---
         function renderDashboardStats() {
             const barangKeys = Object.keys(appData.barang || {});
             let totalBarang = barangKeys.length;
@@ -500,15 +495,9 @@
                 const item = appData.barang[id];
                 const trans = item.transaksi || [];
                 totalTransaksi += trans.length;
-                let saldoAkhir = 0;
-                if (trans.length > 0) {
-                    saldoAkhir = trans[trans.length - 1].saldo || 0;
-                }
-                if (saldoAkhir > 0) {
-                    totalTersedia++;
-                } else {
-                    totalHabis++;
-                }
+                let saldoAkhir = trans.length > 0 ? (trans[trans.length - 1].saldo || 0) : 0;
+                if (saldoAkhir > 0) totalTersedia++;
+                else totalHabis++;
             });
 
             document.getElementById('statTotalBarang').innerText = totalBarang;
@@ -517,7 +506,6 @@
             document.getElementById('statTransaksi').innerText = totalTransaksi;
         }
 
-        // --- 3. Tabel Stok Barang ---
         function renderStokBarangTable() {
             const tbody = document.getElementById('stokBarangTableBody');
             tbody.innerHTML = '';
@@ -561,7 +549,6 @@
             });
         }
 
-        // --- 2. Panel Vendor & Tabel Kartu Stok Harian ---
         function renderVendorPanels() {
             const container = document.getElementById('vendorPanelsContainer');
             container.innerHTML = '';
@@ -586,7 +573,6 @@
                 const panelDiv = document.createElement('div');
                 panelDiv.className = "bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6";
                 
-                // Panel Header / Vendor Bar (Collapsible / Clickable Header)
                 panelDiv.innerHTML = `
                     <div class="bg-slate-900 text-white p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div class="flex items-center space-x-3">
@@ -599,23 +585,21 @@
                             </div>
                         </div>
 
-                        <!-- Panel Detail Vendor & Tombol Aksi -->
                         <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
                             <div class="bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-lg text-xs flex items-center space-x-3">
                                 <div><span class="text-slate-400">Asal:</span> <span class="text-white font-medium">${info.asal || '-'}</span></div>
                             </div>
                             <div class="flex items-center space-x-2">
-                                <button onclick="openModalTransaksi('${id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-2 rounded-lg transition flex items-center space-x-1 shadow-sm">
+                                <button onclick="openModalTransaksi('${id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-2 rounded-lg transition flex items-center space-x-1 shadow-sm cursor-pointer">
                                     <i class="fa-solid fa-plus"></i> <span>Input Transaksi</span>
                                 </button>
-                                <button onclick="deleteBarang('${id}')" title="Hapus Barang" class="bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs p-2 rounded-lg transition">
+                                <button onclick="deleteBarang('${id}')" title="Hapus Barang" class="bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs p-2 rounded-lg transition cursor-pointer">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tabel Memanjang (Horizontal Scroll) -->
                     <div class="overflow-x-auto custom-scrollbar p-1">
                         <table class="w-full text-left border-collapse whitespace-nowrap text-xs">
                             <thead>
@@ -633,7 +617,6 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 text-slate-700" id="table-trans-${id}">
-                                <!-- Transaksi rows -->
                             </tbody>
                         </table>
                     </div>
@@ -641,7 +624,6 @@
 
                 container.appendChild(panelDiv);
 
-                // Render baris transaksi untuk barang ini
                 const transTbody = document.getElementById(`table-trans-${id}`);
                 if (trans.length === 0) {
                     transTbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-slate-400 italic">Belum ada transaksi tercatat. Klik "Input Transaksi".</td></tr>`;
@@ -660,7 +642,7 @@
                             <td class="py-2 px-3 font-bold text-indigo-700 bg-indigo-50/30">${t.saldo}</td>
                             <td class="py-2 px-3 text-slate-600 max-w-xs truncate">${t.keterangan || '-'}</td>
                             <td class="py-2 px-3 text-center">
-                                <button onclick="deleteTransaksi('${id}', ${tIndex})" title="Hapus Baris" class="text-slate-400 hover:text-rose-600 p-1 rounded transition">
+                                <button onclick="deleteTransaksi('${id}', ${tIndex})" title="Hapus Baris" class="text-slate-400 hover:text-rose-600 p-1 rounded transition cursor-pointer">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
                             </td>
@@ -671,7 +653,7 @@
             });
         }
 
-        // --- Modal Manajemen ---
+        // --- Modals ---
         function openModalBarang() {
             document.getElementById('formBarangBaru').reset();
             document.getElementById('modalBarang').classList.remove('hidden');
@@ -732,7 +714,6 @@
             if (!item) return;
             if (!item.transaksi) item.transaksi = [];
 
-            // Hitung akumulatif sebelumnya
             let lastAkuPenerimaan = 0;
             let lastAkuPengeluaran = 0;
             let lastSaldo = 0;
@@ -747,19 +728,12 @@
             const akumulatifPenerimaan = lastAkuPenerimaan + penerimaan;
             const akumulatifPengeluaran = lastAkuPengeluaran + pengeluaran;
 
-            // Logika Saldo:
-            // Saldo awal = penerimaan pertama (jika transaksi pertama)
-            // Selanjutnya: saldo sebelumnya + penerimaan - pengeluaran
             let saldo = lastSaldo;
             if (item.transaksi.length === 0) {
                 saldo = penerimaan - pengeluaran;
             } else {
-                if (penerimaan > 0) {
-                    saldo = lastSaldo + penerimaan;
-                }
-                if (pengeluaran > 0) {
-                    saldo = saldo - pengeluaran;
-                }
+                if (penerimaan > 0) saldo = lastSaldo + penerimaan;
+                if (pengeluaran > 0) saldo = saldo - pengeluaran;
             }
 
             const newTrans = {
@@ -786,7 +760,7 @@
             }
         }
 
-        // --- Export / Import Excel Multi-Sheet ---
+        // --- Export / Import Excel & JSON ---
         function exportToExcel() {
             const wb = XLSX.utils.book_new();
             const barangKeys = Object.keys(appData.barang || {});
@@ -801,7 +775,6 @@
                 const info = item.info;
                 const trans = item.transaksi || [];
 
-                // Format data sheet per barang
                 let sheetData = [
                     ["KARTU STOK HARIAN"],
                     ["Nama Barang:", info.nama],
@@ -827,11 +800,9 @@
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(sheetData);
-                // Batasi nama sheet maksimal 31 karakter dan unik
                 let sheetName = info.nama.replace(/[\*\?\/\\\[\]]/g, "").substring(0, 30);
                 if (!sheetName) sheetName = "Barang";
                 
-                // Pastikan nama sheet unik
                 let counter = 1;
                 let originalSheetName = sheetName;
                 while (wb.SheetNames.includes(sheetName)) {
@@ -853,7 +824,6 @@
                 try {
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-
                     let importedBarang = {};
 
                     workbook.SheetNames.forEach(sheetName => {
@@ -862,7 +832,6 @@
                         
                         if (rows.length < 2) return;
 
-                        // Ambil info dari baris header excel yang kita buat saat export
                         let namaBarang = sheetName;
                         let asalBarang = "";
                         let kodeUkuran = "";
@@ -875,7 +844,6 @@
                             if (r[0] === "Satuan:") satuan = r[1] || "Pcs";
                         });
 
-                        // Cari baris transaksi (setelah baris Tanggal)
                         let transStartIndex = -1;
                         for (let i = 0; i < rows.length; i++) {
                             if (rows[i][0] === "Tanggal") {
@@ -903,7 +871,7 @@
                             }
                         }
 
-                        const bId = 'barang_' + Math.random().toString(36.substring(2, 9));
+                        const bId = 'barang_' + Math.random().toString(36).substring(2, 9);
                         importedBarang[bId] = {
                             info: { nama: namaBarang, asal: asalBarang, kode: kodeUkuran, satuan: satuan },
                             transaksi: transaksiList
@@ -918,7 +886,6 @@
                         alert("Format Excel tidak dikenali atau kosong.");
                     }
                 } catch (err) {
-                    console.error(err);
                     alert("Gagal membaca file Excel!");
                 }
                 e.target.value = "";
@@ -926,7 +893,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- Export / Import JSON di Sidebar ---
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
             const dlAnchor = document.createElement('a');
@@ -960,7 +926,6 @@
             reader.readAsText(file);
         }
 
-        // --- Fitur Share Link & Download App ---
         function shareAppLink() {
             if (navigator.share) {
                 navigator.share({
