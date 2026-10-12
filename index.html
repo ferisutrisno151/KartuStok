@@ -13,12 +13,11 @@
     <!-- Firebase SDK v9 (Modular via CDN) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
         
-        window.firebaseApp = { initializeApp, getDatabase, ref, set, onValue, get };
+        window.firebaseApp = { initializeApp, getDatabase, ref, set, onValue };
     </script>
     <style>
-        /* Custom Scrollbar untuk Tabel Memanjang */
         .table-container::-webkit-scrollbar {
             height: 8px;
             width: 8px;
@@ -74,12 +73,12 @@
                     <h3 class="font-semibold text-sm text-indigo-700 flex items-center gap-1.5">
                         <i class="fa-solid fa-database"></i> Konfigurasi Firebase
                     </h3>
-                    <p class="text-xs text-slate-500">Masukkan konfigurasi Firebase Database Anda agar data tersimpan & tersinkronisasi bersama.</p>
-                    <textarea id="firebaseConfigInput" rows="4" placeholder='Paste objek konfigurasi Firebase di sini (contoh: { apiKey: "...", databaseURL: "..." })' class="w-full text-xs p-2 border rounded border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                    <p class="text-xs text-slate-500">Masukkan objek konfigurasi Firebase agar data tersinkronisasi bersama secara real-time.</p>
+                    <textarea id="firebaseConfigInput" rows="4" placeholder='Contoh: { apiKey: "...", databaseURL: "..." }' class="w-full text-xs p-2 border rounded border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
                     <button onclick="saveFirebaseConfig()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2 rounded font-medium transition shadow">
                         Simpan & Hubungkan Firebase
                     </button>
-                    <div id="firebaseStatus" class="text-xs font-semibold text-amber-600">Status: Menggunakan Penyimpanan Lokal (Offline)</div>
+                    <div id="firebaseStatus" class="text-xs font-semibold text-amber-600">Status: Penyimpanan Lokal (Offline)</div>
                 </div>
 
                 <!-- Fitur JSON & Share -->
@@ -116,30 +115,36 @@
     <!-- Main Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
 
-        <!-- FITUR 1: Dashboard Interaktif -->
+        <!-- FITUR 1: Dashboard Interaktif (Klik Panel untuk Rincian) -->
         <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+            <!-- Panel Total Jenis Barang -->
+            <div onclick="openDashboardModal('total')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between cursor-pointer hover:border-indigo-500 hover:shadow-md transition">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Jenis Barang</p>
                     <h3 id="statTotalBarang" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                    <p class="text-[10px] text-indigo-600 mt-1 font-medium"><i class="fa-solid fa-circle-info"></i> Klik untuk lihat rincian</p>
                 </div>
                 <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-xl">
                     <i class="fa-solid fa-boxes-stacked"></i>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+            <!-- Panel Barang Tersedia -->
+            <div onclick="openDashboardModal('tersedia')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between cursor-pointer hover:border-emerald-500 hover:shadow-md transition">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Barang Tersedia</p>
                     <h3 id="statTersedia" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                    <p class="text-[10px] text-emerald-600 mt-1 font-medium"><i class="fa-solid fa-circle-info"></i> Klik untuk lihat rincian</p>
                 </div>
                 <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-xl">
                     <i class="fa-solid fa-check-circle"></i>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+            <!-- Panel Barang Habis -->
+            <div onclick="openDashboardModal('habis')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between cursor-pointer hover:border-rose-500 hover:shadow-md transition">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Barang Habis</p>
                     <h3 id="statHabis" class="text-2xl font-bold text-rose-600 mt-1">0</h3>
+                    <p class="text-[10px] text-rose-600 mt-1 font-medium"><i class="fa-solid fa-circle-info"></i> Klik untuk lihat rincian</p>
                 </div>
                 <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-xl">
                     <i class="fa-solid fa-triangle-exclamation"></i>
@@ -147,13 +152,13 @@
             </div>
         </section>
 
-        <!-- FITUR 3: Tabel Ringkasan Stok Barang (Terkoneksi Otomatis) -->
+        <!-- FITUR 3: Stok Barang (Tabel Atur Memanjang Scrollable & Auto-sync) -->
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-clipboard-list text-indigo-600"></i> Ringkasan Stok Barang
+                    <i class="fa-solid fa-clipboard-list text-indigo-600"></i> Stok Barang (Fitur 3)
                 </h2>
-                <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-medium">Auto-sync Fitur 2</span>
+                <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-medium">Terhubung Otomatis</span>
             </div>
             <div class="table-container overflow-x-auto">
                 <table class="w-full text-left text-xs whitespace-nowrap">
@@ -161,24 +166,24 @@
                         <tr>
                             <th class="p-2.5">Tanggal Update</th>
                             <th class="p-2.5">Nama Barang</th>
-                            <th class="p-2.5">Ukuran / No. Kode</th>
+                            <th class="p-2.5">Ukuran</th>
                             <th class="p-2.5">Satuan</th>
                             <th class="p-2.5 text-right">Saldo Akhir</th>
                             <th class="p-2.5 text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody id="stockSummaryTableBody" class="divide-y divide-slate-100">
-                        <!-- Baris akan dirender secara dinamis -->
+                        <!-- Baris dirender dinamis -->
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- FITUR 2: Manajemen Barang & Kartu Stok Detail -->
+        <!-- FITUR 2: Nama Barang & Kartu Stok Detail -->
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-folder-open text-indigo-600"></i> Kartu Stok Harian Per Barang
+                    <i class="fa-solid fa-folder-open text-indigo-600"></i> Kartu Stok Harian Per Barang (Fitur 2)
                 </h2>
                 <button onclick="openBarangModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded-lg font-medium shadow transition flex items-center gap-1.5">
                     <i class="fa-solid fa-plus"></i> Tambah Barang Baru
@@ -187,13 +192,38 @@
 
             <!-- Kontainer Panel Berusun ke Bawah -->
             <div id="barangContainer" class="space-y-4">
-                <!-- Panel Barang akan dirender di sini -->
+                <!-- Panel Vendor & Tabel Detail -->
             </div>
         </section>
 
     </main>
 
-    <!-- MODAL 1: Form Tambah/Edit Nama Barang (Vendor Panel info) -->
+    <!-- MODAL DASHBOARD RINCIAN (Fitur 1) -->
+    <div id="dashboardModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full overflow-hidden transform transition-all">
+            <div id="dashboardModalHeader" class="bg-indigo-600 px-4 py-3 text-white flex items-center justify-between">
+                <h3 id="dashboardModalTitle" class="font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-table"></i> Rincian Data</h3>
+                <button onclick="closeDashboardModal()" class="text-white hover:bg-indigo-700 p-1 rounded transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-4 space-y-3">
+                <div class="table-container overflow-x-auto max-h-[60vh]">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead id="dashboardModalTableHead" class="bg-slate-100 text-slate-700 uppercase font-semibold">
+                            <!-- Header dinamis -->
+                        </thead>
+                        <tbody id="dashboardModalTableBody" class="divide-y divide-slate-100">
+                            <!-- Isi dinamis -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex justify-end pt-2">
+                    <button type="button" onclick="closeDashboardModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-4 py-2 rounded-lg font-medium transition">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: Form Tambah/Edit Nama Barang -->
     <div id="barangModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden transform transition-all">
             <div class="bg-indigo-600 px-4 py-3 text-white flex items-center justify-between">
@@ -216,7 +246,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1">Satuan</label>
-                    <input type="text" id="inputSatuan" required class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Contoh: Sak / Pcs / Batang">
+                    <input type="text" id="inputSatuan" required class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Contoh: Sak / Pcs">
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closeBarangModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-4 py-2 rounded-lg font-medium transition">Batal</button>
@@ -226,7 +256,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: Form Input Transaksi Harian (Penerimaan / Pengeluaran) -->
+    <!-- MODAL 2: Form Input Transaksi Harian -->
     <div id="transaksiModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden transform transition-all">
             <div class="bg-indigo-600 px-4 py-3 text-white flex items-center justify-between">
@@ -278,7 +308,6 @@
 
     <!-- JavaScript Aplikasi -->
     <script>
-        // State Global Aplikasi
         let appData = {
             barangList: []
         };
@@ -286,10 +315,8 @@
         let db = null;
         let firebaseConfigured = false;
 
-        // Inisialisasi Tanggal Default pada Form Transaksi
         document.getElementById('inputTrTanggal').valueAsDate = new Date();
 
-        // Load data tersimpan saat pertama kali dibuka
         window.addEventListener('DOMContentLoaded', () => {
             const savedConfig = localStorage.getItem('firebase_config_stok');
             if (savedConfig) {
@@ -304,30 +331,26 @@
             }
         });
 
-        // Pull to Refresh / Tombol Reload Custom
-        // Mengubah fungsi reload agar memuat ulang data terbaru tanpa reset ke setelan awal
-        window.addEventListener('load', () => {
-            let touchstartY = 0;
-            window.addEventListener('touchstart', e => { touchstartY = e.touches[0].clientY; });
-            window.addEventListener('touchend', e => {
-                let touchendY = e.changedTouches[0].clientY;
-                if (touchendY - touchstartY > 120 && window.scrollY === 0) {
-                    reloadLatestData();
-                }
-            });
+        // Pull to refresh / Tarik layar ke bawah reload data terbaru tanpa reset
+        let touchstartY = 0;
+        window.addEventListener('touchstart', e => { touchstartY = e.touches[0].clientY; });
+        window.addEventListener('touchend', e => {
+            let touchendY = e.changedTouches[0].clientY;
+            if (touchendY - touchstartY > 120 && window.scrollY === 0) {
+                reloadLatestData();
+            }
         });
 
         function reloadLatestData() {
             if (firebaseConfigured && db) {
-                // Firebase melakukan sync otomatis, tampilkan notif kecil
-                showToast("Data terbaru berhasil dimuat ulang dari server.");
+                showToast("Data terbaru disinkronkan dari server.");
             } else {
                 const localData = localStorage.getItem('kartu_stok_app_data');
                 if (localData) {
                     appData = JSON.parse(localData);
                     renderAll();
                 }
-                showToast("Data lokal dimuat ulang.");
+                showToast("Data dimuat ulang.");
             }
         }
 
@@ -343,7 +366,7 @@
             }, 3000);
         }
 
-        // --- SIDEBAR OVERLAY LOGIC ---
+        // Sidebar Controls
         const hamburgerBtn = document.getElementById('hamburgerBtn');
         const closeSidebar = document.getElementById('closeSidebar');
         const sidebar = document.getElementById('sidebar');
@@ -365,26 +388,25 @@
         closeSidebar.addEventListener('click', () => toggleSidebar(false));
         sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
 
-        // --- FIREBASE CONFIGURATION ---
+        // Firebase Sync
         function saveFirebaseConfig() {
             const val = document.getElementById('firebaseConfigInput').value.trim();
             if (!val) {
                 localStorage.removeItem('firebase_config_stok');
                 firebaseConfigured = false;
-                document.getElementById('firebaseStatus').textContent = "Status: Menggunakan Penyimpanan Lokal (Offline)";
-                document.getElementById('firebaseStatusclassName').className = "text-xs font-semibold text-amber-600";
+                document.getElementById('firebaseStatus').textContent = "Status: Penyimpanan Lokal (Offline)";
+                document.getElementById('firebaseStatus').className = "text-xs font-semibold text-amber-600";
                 showToast("Konfigurasi Firebase dihapus.");
                 return;
             }
             try {
-                // Evaluasi objek config
                 const configObj = eval('(' + val + ')');
                 localStorage.setItem('firebase_config_stok', val);
                 tryInitFirebase(configObj);
                 showToast("Firebase berhasil dihubungkan!");
                 toggleSidebar(false);
             } catch (err) {
-                alert("Format konfigurasi Firebase tidak valid. Pastikan format objek JavaScript benar.");
+                alert("Format konfigurasi Firebase tidak valid.");
             }
         }
 
@@ -394,10 +416,9 @@
                 const fbApp = initializeApp(configObj);
                 db = getDatabase(fbApp);
                 firebaseConfigured = true;
-                document.getElementById('firebaseStatus').textContent = "Status: Terhubung ke Firebase (Real-time Sync)";
+                document.getElementById('firebaseStatus').textContent = "Status: Terhubung ke Firebase (Real-time)";
                 document.getElementById('firebaseStatus').className = "text-xs font-semibold text-emerald-600";
 
-                // Listen real-time changes
                 const dataRef = ref(db, 'kartu_stok_data');
                 onValue(dataRef, (snapshot) => {
                     const data = snapshot.val();
@@ -424,7 +445,7 @@
             renderAll();
         }
 
-        // --- MODAL CONTROLS ---
+        // Modal Controls
         function openBarangModal(index = '') {
             document.getElementById('barangEditIndex').value = index;
             if (index !== '') {
@@ -452,7 +473,55 @@
             document.getElementById('transaksiModal').classList.add('hidden');
         }
 
-        // --- HANDLE SUBMISSIONS ---
+        // Dashboard Interactive Modal (Fitur 1 Clickable Panels)
+        function openDashboardModal(type) {
+            const modal = document.getElementById('dashboardModal');
+            const titleEl = document.getElementById('dashboardModalTitle');
+            const headEl = document.getElementById('dashboardModalTableHead');
+            const bodyEl = document.getElementById('dashboardModalTableBody');
+            bodyEl.innerHTML = '';
+
+            let processedItems = getProcessedBarangSummary();
+
+            if (type === 'total') {
+                titleEl.innerHTML = `<i class="fa-solid fa-boxes-stacked"></i> Rincian Total Jenis Barang (${processedItems.length})`;
+                headEl.innerHTML = `<tr><th class="p-2.5">Nama Barang</th><th class="p-2.5">Asal Barang</th><th class="p-2.5">No. Kode / Ukuran</th><th class="p-2.5">Satuan</th></tr>`;
+                if (processedItems.length === 0) {
+                    bodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Belum ada data barang.</td></tr>`;
+                }
+                processedItems.forEach(item => {
+                    bodyEl.innerHTML += `<tr class="hover:bg-slate-50"><td class="p-2.5 font-medium text-slate-800">${escapeHtml(item.nama)}</td><td class="p-2.5">${escapeHtml(item.asal)}</td><td class="p-2.5">${escapeHtml(item.kodeUkuran)}</td><td class="p-2.5">${escapeHtml(item.satuan)}</td></tr>`;
+                });
+            } else if (type === 'tersedia') {
+                const filtered = processedItems.filter(i => i.saldoAkhir > 0);
+                titleEl.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-600"></i> Rincian Barang Tersedia (${filtered.length})`;
+                headEl.innerHTML = `<tr><th class="p-2.5">Nama Barang</th><th class="p-2.5">Ukuran</th><th class="p-2.5 text-center">Status</th><th class="p-2.5 text-right">Saldo</th></tr>`;
+                if (filtered.length === 0) {
+                    bodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Tidak ada barang tersedia.</td></tr>`;
+                }
+                filtered.forEach(item => {
+                    bodyEl.innerHTML += `<tr class="hover:bg-slate-50"><td class="p-2.5 font-medium text-slate-800">${escapeHtml(item.nama)}</td><td class="p-2.5">${escapeHtml(item.kodeUkuran)}</td><td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600">tersedia</span></td><td class="p-2.5 text-right font-bold text-emerald-600">${item.saldoAkhir} ${escapeHtml(item.satuan)}</td></tr>`;
+                });
+            } else if (type === 'habis') {
+                const filtered = processedItems.filter(i => i.saldoAkhir <= 0);
+                titleEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-600"></i> Rincian Barang Habis (${filtered.length})`;
+                headEl.innerHTML = `<tr><th class="p-2.5">Nama Barang</th><th class="p-2.5">Ukuran</th><th class="p-2.5 text-center">Status</th><th class="p-2.5 text-right">Saldo</th></tr>`;
+                if (filtered.length === 0) {
+                    bodyEl.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Tidak ada barang habis.</td></tr>`;
+                }
+                filtered.forEach(item => {
+                    bodyEl.innerHTML += `<tr class="hover:bg-slate-50"><td class="p-2.5 font-medium text-slate-800">${escapeHtml(item.nama)}</td><td class="p-2.5">${escapeHtml(item.kodeUkuran)}</td><td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-600">habis</span></td><td class="p-2.5 text-right font-bold text-rose-600">${item.saldoAkhir} ${escapeHtml(item.satuan)}</td></tr>`;
+                });
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeDashboardModal() {
+            document.getElementById('dashboardModal').classList.add('hidden');
+        }
+
+        // Form Submit Handlers
         function handleBarangSubmit(e) {
             e.preventDefault();
             const editIndex = document.getElementById('barangEditIndex').value;
@@ -502,7 +571,6 @@
                 keterangan
             });
 
-            // Urutkan transaksi berdasarkan tanggal
             barang.transaksi.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
             saveDataToStorage();
@@ -511,7 +579,7 @@
         }
 
         function deleteBarang(index) {
-            if (confirm("Apakah Anda yakin ingin menghapus barang ini beserta seluruh kartu stoknya?")) {
+            if (confirm("Hapus barang ini beserta seluruh kartu stoknya?")) {
                 appData.barangList.splice(index, 1);
                 saveDataToStorage();
                 showToast("Barang dihapus.");
@@ -526,14 +594,37 @@
             }
         }
 
-        // --- RENDER & KALKULASI UTAMA ---
+        function getProcessedBarangSummary() {
+            return appData.barangList.map(barang => {
+                let saldoAkhir = 0;
+                let lastTanggal = '-';
+                if (barang.transaksi && barang.transaksi.length > 0) {
+                    barang.transaksi.forEach((tr, idx) => {
+                        if (idx === 0) {
+                            saldoAkhir = (tr.penerimaan || 0) - (tr.pengeluaran || 0);
+                        } else {
+                            saldoAkhir = saldoAkhir + (tr.penerimaan || 0) - (tr.pengeluaran || 0);
+                        }
+                        lastTanggal = tr.tanggal;
+                    });
+                }
+                return {
+                    ...barang,
+                    saldoAkhir,
+                    lastTanggal
+                };
+            });
+        }
+
+        // Rendering Utama
         function renderAll() {
             renderDashboardAndSummary();
             renderBarangPanels();
         }
 
         function renderDashboardAndSummary() {
-            const totalBarang = appData.barangList.length;
+            const processed = getProcessedBarangSummary();
+            const totalBarang = processed.length;
             let tersediaCount = 0;
             let habisCount = 0;
 
@@ -544,40 +635,22 @@
                 summaryTableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada data barang. Silakan tambah barang baru.</td></tr>`;
             }
 
-            appData.barangList.forEach((barang) => {
-                let akumPenerimaan = 0;
-                let akumPengeluaran = 0;
-                let saldoAkhir = 0;
-                let lastTanggal = '-';
-
-                if (barang.transaksi && barang.transaksi.length > 0) {
-                    barang.transaksi.forEach((tr, idx) => {
-                        akumPenerimaan += tr.penerimaan;
-                        akumPengeluaran += tr.pengeluaran;
-                        if (idx === 0) {
-                            saldoAkhir = tr.penerimaan - tr.pengeluaran;
-                        } else {
-                            saldoAkhir = saldoAkhir + tr.penerimaan - tr.pengeluaran;
-                        }
-                        lastTanggal = tr.tanggal;
-                    });
-                }
-
-                const status = saldoAkhir > 0 ? 'tersedia' : 'habis';
-                if (saldoAkhir > 0) tersediaCount++;
+            processed.forEach((item) => {
+                const status = item.saldoAkhir > 0 ? 'tersedia' : 'habis';
+                if (item.saldoAkhir > 0) tersediaCount++;
                 else habisCount++;
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="p-2.5">${lastTanggal}</td>
-                    <td class="p-2.5 font-medium text-slate-800">${escapeHtml(barang.nama)}</td>
-                    <td class="p-2.5">${escapeHtml(barang.kodeUkuran)}</td>
-                    <td class="p-2.5">${escapeHtml(barang.satuan)}</td>
-                    <td class="p-2.5 text-right font-bold text-indigo-600">${saldoAkhir}</td>
+                    <td class="p-2.5">${item.lastTanggal}</td>
+                    <td class="p-2.5 font-medium text-slate-800">${escapeHtml(item.nama)}</td>
+                    <td class="p-2.5">${escapeHtml(item.kodeUkuran)}</td>
+                    <td class="p-2.5">${escapeHtml(item.satuan)}</td>
+                    <td class="p-2.5 text-right font-bold text-indigo-600">${item.saldoAkhir}</td>
                     <td class="p-2.5 text-center">
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${status === 'tersedia' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">
-                            ${status === 'tersedia' ? 'Tersedia' : 'Habis'}
+                            ${status === 'tersedia' ? 'tersedia' : 'habis'}
                         </span>
                     </td>
                 `;
@@ -594,12 +667,11 @@
             container.innerHTML = '';
 
             if (appData.barangList.length === 0) {
-                container.innerHTML = `<div class="p-8 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">Belum ada panel barang tersimpan. Klik tombol "Tambah Barang Baru" di atas.</div>`;
+                container.innerHTML = `<div class="p-8 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">Belum ada panel barang. Klik tombol "Tambah Barang Baru" di atas.</div>`;
                 return;
             }
 
             appData.barangList.forEach((barang, bIndex) => {
-                // Hitung akumulatif & saldo per baris transaksi
                 let currentAkumPenerimaan = 0;
                 let currentAkumPengeluaran = 0;
                 let currentSaldo = 0;
@@ -636,29 +708,28 @@
                         `;
                     });
                 } else {
-                    rowsHtml = `<tr><td colspan="10" class="p-4 text-center text-slate-400">Belum ada transaksi untuk barang ini. Klik "Tambah Transaksi" di bawah.</td></tr>`;
+                    rowsHtml = `<tr><td colspan="10" class="p-4 text-center text-slate-400">Belum ada transaksi. Klik "Tambah Transaksi".</td></tr>`;
                 }
 
                 const panelCard = document.createElement('div');
                 panelCard.className = "bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm space-y-3 p-4";
                 panelCard.innerHTML = `
-                    <!-- Panel Vendor / Detail Info Barang -->
                     <div class="bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs w-full">
                             <div>
-                                <span class="text-slate-500 block">Nama Barang</span>
+                                <span class="text-slate-500 block">nama barang</span>
                                 <span class="font-bold text-slate-800 text-sm">${escapeHtml(barang.nama)}</span>
                             </div>
                             <div>
-                                <span class="text-slate-500 block">Asal Barang</span>
+                                <span class="text-slate-500 block">asal barang</span>
                                 <span class="font-semibold text-slate-700">${escapeHtml(barang.asal)}</span>
                             </div>
                             <div>
-                                <span class="text-slate-500 block">No. Kode / Ukuran</span>
+                                <span class="text-slate-500 block">no. kode/ ukuran</span>
                                 <span class="font-semibold text-slate-700">${escapeHtml(barang.kodeUkuran)}</span>
                             </div>
                             <div>
-                                <span class="text-slate-500 block">Satuan</span>
+                                <span class="text-slate-500 block">satuan</span>
                                 <span class="font-semibold text-slate-700">${escapeHtml(barang.satuan)}</span>
                             </div>
                         </div>
@@ -672,7 +743,6 @@
                         </div>
                     </div>
 
-                    <!-- Action Bar Kartu Stok -->
                     <div class="flex items-center justify-between pt-1">
                         <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Tabel Kartu Stok</h4>
                         <button onclick="openTransaksiModal(${bIndex})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium shadow transition flex items-center gap-1">
@@ -680,21 +750,20 @@
                         </button>
                     </div>
 
-                    <!-- Tabel Atur Memanjang Scrollable -->
                     <div class="table-container overflow-x-auto border border-slate-200 rounded-lg">
                         <table class="w-full text-left text-xs whitespace-nowrap">
                             <thead class="bg-slate-100 text-slate-700 uppercase font-semibold">
                                 <tr>
-                                    <th class="p-2.5">Tanggal</th>
-                                    <th class="p-2.5">No. GR</th>
-                                    <th class="p-2.5">Penerimaan</th>
-                                    <th class="p-2.5">Akumulatif (Masuk)</th>
-                                    <th class="p-2.5">No. Tiket</th>
-                                    <th class="p-2.5">Pengeluaran</th>
-                                    <th class="p-2.5">Akumulatif (Keluar)</th>
-                                    <th class="p-2.5">Saldo</th>
-                                    <th class="p-2.5">Keterangan</th>
-                                    <th class="p-2.5 text-center">Aksi</th>
+                                    <th class="p-2.5">tanggal</th>
+                                    <th class="p-2.5">no gr</th>
+                                    <th class="p-2.5">penerimaan</th>
+                                    <th class="p-2.5">akumulatif</th>
+                                    <th class="p-2.5">no tiket</th>
+                                    <th class="p-2.5">pengeluaran</th>
+                                    <th class="p-2.5">akumulatif</th>
+                                    <th class="p-2.5">saldo</th>
+                                    <th class="p-2.5">keterangan</th>
+                                    <th class="p-2.5 text-center">aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -712,7 +781,7 @@
             return text.toString().replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#039;');
         }
 
-        // --- EXPORT / IMPORT EXCEL (Multi-Sheet) ---
+        // Export / Import Excel (Multi-Sheet)
         function exportToExcel() {
             if (appData.barangList.length === 0) {
                 alert("Tidak ada data untuk diexport.");
@@ -723,17 +792,15 @@
 
             appData.barangList.forEach((barang) => {
                 let sheetData = [];
-                // Baris Informasi Vendor / Header di dalam sheet
-                sheetData.push(["Nama Barang", barang.nama]);
-                sheetData.push(["Asal Barang", barang.asal]);
-                sheetData.push(["No. Kode / Ukuran", barang.kodeUkuran]);
-                sheetData.push(["Satuan", barang.satuan]);
-                sheetData.push([]); // Baris kosong
+                sheetData.push(["nama barang", barang.nama]);
+                sheetData.push(["asal barang", barang.asal]);
+                sheetData.push(["no. kode / ukuran", barang.kodeUkuran]);
+                sheetData.push(["satuan", barang.satuan]);
+                sheetData.push([]);
 
-                // Header Tabel
                 sheetData.push([
-                    "Tanggal", "No GR", "Penerimaan", "Akumulatif (Masuk)", 
-                    "No Tiket", "Pengeluaran", "Akumulatif (Keluar)", "Saldo", "Keterangan"
+                    "tanggal", "no gr", "penerimaan", "akumulatif", 
+                    "no tiket", "pengeluaran", "akumulatif", "saldo", "keterangan"
                 ]);
 
                 let curAkumIn = 0;
@@ -765,10 +832,8 @@
                 }
 
                 const ws = XLSX.utils.aoa_to_sheet(sheetData);
-                // Nama sheet dibatasi maksimal 31 karakter oleh Excel dan dibersihkan dari karakter ilegal
                 let sheetName = barang.nama.replace(/[\\/?*+[\]]/g, "").substring(0, 31) || "Sheet";
                 
-                // Pastikan nama sheet unik
                 let finalSheetName = sheetName;
                 let counter = 1;
                 while (wb.SheetNames.includes(finalSheetName)) {
@@ -806,7 +871,6 @@
                             let satuan = "-";
                             let transaksiStartIdx = -1;
 
-                            // Parsing metadata barang dari baris awal sheet
                             for (let i = 0; i < Math.min(json.length, 6); i++) {
                                 let row = json[i];
                                 if (row && row.length >= 2) {
@@ -863,7 +927,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- EXPORT / IMPORT JSON, SHARE LINK, & DOWNLOAD APP ---
+        // Export/Import JSON, Share Link & Download App
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
             const dlAnchor = document.createElement('a');
@@ -903,7 +967,7 @@
             if (navigator.share) {
                 navigator.share({
                     title: 'Aplikasi Kartu Stok Harian',
-                    text: 'Gunakan aplikasi Kartu Stok Harian bersama secara real-time!',
+                    text: 'Akses kartu stok harian bersama secara real-time!',
                     url: window.location.href
                 }).catch(() => {});
             } else {
