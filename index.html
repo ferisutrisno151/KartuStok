@@ -71,10 +71,10 @@
         </div>
     </header>
 
-    <!-- Sidebar Overlay (Layar Hitam Transparan, Secara Bawaan Diberi pointer-events-none Agar Tidak Mengunci Layar) -->
+    <!-- Sidebar Overlay -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden opacity-0 transition-opacity duration-300 pointer-events-none"></div>
 
-    <!-- Sidebar Drawer -->
+    <!-- Sidebar Drawer (Menu & Fitur) -->
     <aside id="sidebarDrawer" class="fixed top-0 left-0 bottom-0 w-80 bg-white z-50 shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col justify-between">
         <div>
             <!-- Sidebar Header -->
@@ -139,8 +139,8 @@
 
         <!-- Identitas Pembuat di Footer Sidebar -->
         <div class="p-4 border-t border-slate-200 bg-slate-50 text-center">
-            <p class="text-xs text-slate-500 font-medium">Dibuat dengan ❤️ untuk Pengelolaan Stok</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">Versi 2.0 • Modern UI & Realtime Firebase</p>
+            <p class="text-xs text-slate-500 font-medium">Dibuat oleh Feri Sutrisno</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Versi 2.1 • Kartu Stok Harian Pro</p>
         </div>
     </aside>
 
@@ -187,7 +187,7 @@
             </div>
         </section>
 
-        <!-- 3. Stok Barang (Ringkasan Tabel Memanjang) -->
+        <!-- 3. Stok Barang (Ringkasan Tabel Memanjang) -> Diletakkan Sesuai Permintaan -->
         <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
@@ -222,14 +222,14 @@
             </div>
         </section>
 
-        <!-- 2. Kartu Stok Harian (Panel Vendor & Detail Transaksi) -->
+        <!-- 2. Kartu Stok Harian (Panel Vendor & Detail Transaksi) -> Diletakkan Sesuai Permintaan -->
         <section class="space-y-6">
             <div class="flex justify-between items-center">
                 <div>
                     <h2 class="font-bold text-xl text-slate-900 flex items-center gap-2">
                         <i class="fa-solid fa-book-open text-indigo-600"></i> Kartu Stok Harian Per Barang
                     </h2>
-                    <p class="text-xs text-slate-500">Klik panel vendor untuk melihat detail dan menambah transaksi harian.</p>
+                    <p class="text-xs text-slate-500">Klik panel vendor / tombol panah untuk menampilkan atau menyembunyikan rincian tabel.</p>
                 </div>
             </div>
 
@@ -338,8 +338,9 @@
         let appData = { barang: {} };
         let db = null;
         let isFirebaseConnected = false;
+        let openPanels = {}; // Menyimpan status panel yang terbuka
 
-        // --- Perbaikan Utama Logika Sidebar Touch/Click ---
+        // --- Sidebar Interaksi ---
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
         const sidebarDrawer = document.getElementById('sidebarDrawer');
@@ -373,7 +374,7 @@
 
         sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
 
-        // --- Load Data awal ---
+        // --- Load Data Awal ---
         window.addEventListener('DOMContentLoaded', () => {
             const savedConfig = localStorage.getItem('firebase_config_stok');
             if (savedConfig) {
@@ -554,6 +555,11 @@
             });
         }
 
+        function togglePanel(id) {
+            openPanels[id] = !openPanels[id];
+            renderVendorPanels();
+        }
+
         function renderVendorPanels() {
             const container = document.getElementById('vendorPanelsContainer');
             container.innerHTML = '';
@@ -574,23 +580,27 @@
                 const item = appData.barang[id];
                 const info = item.info;
                 const trans = item.transaksi || [];
+                const isOpen = openPanels[id] || false;
 
                 const panelDiv = document.createElement('div');
                 panelDiv.className = "bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6";
                 
                 panelDiv.innerHTML = `
-                    <div class="bg-slate-900 text-white p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="bg-slate-900 text-white p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 cursor-pointer select-none" onclick="togglePanel('${id}')">
                         <div class="flex items-center space-x-3">
                             <div class="bg-indigo-600 text-white p-2.5 rounded-xl">
                                 <i class="fa-solid fa-cube"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-base text-white">${info.nama}</h3>
+                                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                    ${info.nama} 
+                                    <i class="fa-solid fa-chevron-${isOpen ? 'up' : 'down'} text-xs text-indigo-300"></i>
+                                </h3>
                                 <p class="text-xs text-slate-300">Kode: <span class="font-mono font-semibold text-indigo-300">${info.kode || '-'}</span> | Satuan: <span class="font-semibold text-white">${info.satuan}</span></p>
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+                        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end" onclick="event.stopPropagation()">
                             <div class="bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-lg text-xs flex items-center space-x-3">
                                 <div><span class="text-slate-400">Asal:</span> <span class="text-white font-medium">${info.asal || '-'}</span></div>
                             </div>
@@ -605,7 +615,8 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto custom-scrollbar p-1">
+                    <!-- Tabel Memanjang (Horizontal Scroll) - Muncul Saat Panel Diklik -->
+                    <div class="${isOpen ? '' : 'hidden'} overflow-x-auto custom-scrollbar p-1 border-t border-slate-100">
                         <table class="w-full text-left border-collapse whitespace-nowrap text-xs">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider border-b border-slate-200">
@@ -629,31 +640,33 @@
 
                 container.appendChild(panelDiv);
 
-                const transTbody = document.getElementById(`table-trans-${id}`);
-                if (trans.length === 0) {
-                    transTbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-slate-400 italic">Belum ada transaksi tercatat. Klik "Input Transaksi".</td></tr>`;
-                } else {
-                    trans.forEach((t, tIndex) => {
-                        const trT = document.createElement('tr');
-                        trT.className = "hover:bg-slate-50/80 transition";
-                        trT.innerHTML = `
-                            <td class="py-2 px-3 font-medium text-slate-600">${t.tanggal}</td>
-                            <td class="py-2 px-3 text-slate-600">${t.noGr || '-'}</td>
-                            <td class="py-2 px-3 font-semibold text-emerald-600 bg-emerald-50/30">${t.penerimaan > 0 ? '+' + t.penerimaan : '-'}</td>
-                            <td class="py-2 px-3 font-medium text-emerald-700 bg-emerald-50/30">${t.akumulatifPenerimaan}</td>
-                            <td class="py-2 px-3 text-slate-600">${t.noTiket || '-'}</td>
-                            <td class="py-2 px-3 font-semibold text-rose-600 bg-rose-50/30">${t.pengeluaran > 0 ? '-' + t.pengeluaran : '-'}</td>
-                            <td class="py-2 px-3 font-medium text-rose-700 bg-rose-50/30">${t.akumulatifPengeluaran}</td>
-                            <td class="py-2 px-3 font-bold text-indigo-700 bg-indigo-50/30">${t.saldo}</td>
-                            <td class="py-2 px-3 text-slate-600 max-w-xs truncate">${t.keterangan || '-'}</td>
-                            <td class="py-2 px-3 text-center">
-                                <button onclick="deleteTransaksi('${id}', ${tIndex})" title="Hapus Baris" class="text-slate-400 hover:text-rose-600 p-1 rounded transition cursor-pointer">
-                                    <i class="fa-solid fa-trash-can text-xs"></i>
-                                </button>
-                            </td>
-                        `;
-                        transTbody.appendChild(trT);
-                    });
+                if (isOpen) {
+                    const transTbody = document.getElementById(`table-trans-${id}`);
+                    if (trans.length === 0) {
+                        transTbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-slate-400 italic">Belum ada transaksi tercatat. Klik "Input Transaksi".</td></tr>`;
+                    } else {
+                        trans.forEach((t, tIndex) => {
+                            const trT = document.createElement('tr');
+                            trT.className = "hover:bg-slate-50/80 transition";
+                            trT.innerHTML = `
+                                <td class="py-2 px-3 font-medium text-slate-600">${t.tanggal}</td>
+                                <td class="py-2 px-3 text-slate-600">${t.noGr || '-'}</td>
+                                <td class="py-2 px-3 font-semibold text-emerald-600 bg-emerald-50/30">${t.penerimaan > 0 ? '+' + t.penerimaan : '-'}</td>
+                                <td class="py-2 px-3 font-medium text-emerald-700 bg-emerald-50/30">${t.akumulatifPenerimaan}</td>
+                                <td class="py-2 px-3 text-slate-600">${t.noTiket || '-'}</td>
+                                <td class="py-2 px-3 font-semibold text-rose-600 bg-rose-50/30">${t.pengeluaran > 0 ? t.pengeluaran : '-'}</td>
+                                <td class="py-2 px-3 font-medium text-rose-700 bg-rose-50/30">${t.akumulatifPengeluaran}</td>
+                                <td class="py-2 px-3 font-bold text-indigo-700 bg-indigo-50/30">${t.saldo}</td>
+                                <td class="py-2 px-3 text-slate-600 max-w-xs truncate">${t.keterangan || '-'}</td>
+                                <td class="py-2 px-3 text-center">
+                                    <button onclick="deleteTransaksi('${id}', ${tIndex})" title="Hapus Baris" class="text-slate-400 hover:text-rose-600 p-1 rounded transition cursor-pointer">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                </td>
+                            `;
+                            transTbody.appendChild(trT);
+                        });
+                    }
                 }
             });
         }
@@ -683,6 +696,7 @@
                 info: { nama, asal, kode, satuan },
                 transaksi: []
             };
+            openPanels[barangId] = true; // Otomatis buka panel baru
 
             saveDataStorage();
             closeModalBarang();
@@ -754,6 +768,7 @@
             };
 
             item.transaksi.push(newTrans);
+            openPanels[barangId] = true;
             saveDataStorage();
             closeModalTransaksi();
         }
