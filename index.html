@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- SheetJS (XLSX) untuk Ekspor/Impor Excel Multi-Sheet -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- Firebase SDK (Modular v9 via CDN / compat) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
@@ -31,14 +31,14 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
 
-    <!-- Top Navbar (Diperbaiki z-index dan posisinya agar bisa diklik) -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center relative z-50">
+    <!-- Top Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <button id="sidebarToggle" class="relative z-50 text-slate-600 hover:text-indigo-600 focus:outline-none p-2 rounded-lg hover:bg-slate-100 transition cursor-pointer">
-                    <i class="fa-solid fa-bars text-xl"></i>
+                <button id="sidebarToggle" type="button" class="text-slate-600 hover:text-indigo-600 focus:outline-none p-2 rounded-lg hover:bg-slate-100 transition cursor-pointer select-none">
+                    <i class="fa-solid fa-bars text-xl pointer-events-none"></i>
                 </button>
                 <div class="flex items-center space-x-2">
                     <div class="bg-indigo-600 text-white p-2 rounded-lg">
@@ -49,7 +49,7 @@
             </div>
 
             <!-- Tombol Header: Refresh, Tambah Barang, Export/Import Excel -->
-            <div class="flex items-center space-x-2 sm:space-x-3 relative z-50">
+            <div class="flex items-center space-x-2 sm:space-x-3">
                 <button onclick="refreshDataSmart()" title="Refresh Data Terbaru" class="flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer">
                     <i class="fa-solid fa-rotate"></i>
                     <span class="hidden sm:inline">Refresh</span>
@@ -71,8 +71,10 @@
         </div>
     </header>
 
-    <!-- Sidebar Overlay & Drawer -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden transition-opacity opacity-0"></div>
+    <!-- Sidebar Overlay (Layar Hitam Transparan, Secara Bawaan Diberi pointer-events-none Agar Tidak Mengunci Layar) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+
+    <!-- Sidebar Drawer -->
     <aside id="sidebarDrawer" class="fixed top-0 left-0 bottom-0 w-80 bg-white z-50 shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col justify-between">
         <div>
             <!-- Sidebar Header -->
@@ -80,8 +82,8 @@
                 <h2 class="font-bold text-slate-800 flex items-center gap-2">
                     <i class="fa-solid fa-gear text-indigo-600"></i> Pengaturan & Menu
                 </h2>
-                <button id="sidebarClose" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button id="sidebarClose" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg pointer-events-none"></i>
                 </button>
             </div>
 
@@ -231,9 +233,8 @@
                 </div>
             </div>
 
-            <!-- Kontainer Panel Vendor & Tabel Transaksi Tersusun ke Bawah -->
             <div id="vendorPanelsContainer" class="space-y-6">
-                <!-- Panel akan digenerate secara dinamis di sini -->
+                <!-- Panel akan digenerate secara dinamis -->
             </div>
         </section>
 
@@ -334,16 +335,11 @@
 
     <!-- JavaScript Logika Aplikasi -->
     <script>
-        // --- State Aplikasi ---
-        let appData = {
-            barang: {}
-        };
-
-        let firebaseConfig = null;
+        let appData = { barang: {} };
         let db = null;
         let isFirebaseConnected = false;
 
-        // --- Inisialisasi Sidebar & Event ---
+        // --- Perbaikan Utama Logika Sidebar Touch/Click ---
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
         const sidebarDrawer = document.getElementById('sidebarDrawer');
@@ -352,20 +348,32 @@
         function toggleSidebar(open) {
             if (open) {
                 sidebarOverlay.classList.remove('hidden');
+                sidebarOverlay.classList.remove('pointer-events-none');
                 setTimeout(() => sidebarOverlay.classList.remove('opacity-0'), 10);
                 sidebarDrawer.classList.remove('-translate-x-full');
             } else {
                 sidebarOverlay.classList.add('opacity-0');
                 sidebarDrawer.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('pointer-events-none');
                 setTimeout(() => sidebarOverlay.classList.add('hidden'), 300);
             }
         }
 
-        sidebarToggle.addEventListener('click', () => toggleSidebar(true));
-        sidebarClose.addEventListener('click', () => toggleSidebar(false));
+        sidebarToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleSidebar(true);
+        });
+
+        sidebarClose.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleSidebar(false);
+        });
+
         sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
 
-        // --- Load Data Awal (LocalStorage / Firebase) ---
+        // --- Load Data awal ---
         window.addEventListener('DOMContentLoaded', () => {
             const savedConfig = localStorage.getItem('firebase_config_stok');
             if (savedConfig) {
@@ -410,7 +418,6 @@
             renderAll();
         }
 
-        // --- Refresh Cerdas ---
         function refreshDataSmart() {
             const btn = document.querySelector('button[onclick="refreshDataSmart()"]');
             const icon = btn.querySelector('i');
@@ -433,7 +440,6 @@
             }
         }
 
-        // --- Konfigurasi Firebase ---
         function saveFirebaseConfig() {
             const val = document.getElementById('firebaseConfigInput').value.trim();
             if (!val) {
@@ -477,7 +483,6 @@
             }
         }
 
-        // --- Render UI ---
         function renderAll() {
             renderDashboardStats();
             renderStokBarangTable();
@@ -760,7 +765,7 @@
             }
         }
 
-        // --- Export / Import Excel & JSON ---
+        // --- Export / Import ---
         function exportToExcel() {
             const wb = XLSX.utils.book_new();
             const barangKeys = Object.keys(appData.barang || {});
