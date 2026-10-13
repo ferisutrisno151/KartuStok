@@ -384,8 +384,8 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         let appData = { barang: {} };
-        let openCategories = {}; // Menyimpan status buka/tutup panel kategori utama
-        let openItems = {};      // Menyimpan status buka/tutup sub-panel item varian
+        let openCategories = {}; 
+        let openItems = {};      
 
         document.addEventListener('DOMContentLoaded', () => {
             setupSidebarEvents();
@@ -578,11 +578,9 @@
             document.getElementById('dashTotalHabis').innerText = totalHabis;
         }
 
-        // Fungsi Helper untuk Mendapatkan Kategori Utama dari Nama Barang (Misal: "Besi Beton D10" -> "Besi Beton")
         function getCategoryName(namaBarang) {
             const parts = namaBarang.trim().split(' ');
             if (parts.length > 1) {
-                // Jika kata terakhir diawali huruf D atau angka (misal D10, 500), ambil depannya sebagai kategori
                 const last = parts[parts.length - 1];
                 if (/^d\d+/i.test(last) || /^\d+/.test(last)) {
                     parts.pop();
@@ -619,7 +617,6 @@
                 return;
             }
 
-            // Kelompokkan berdasarkan Kategori Utama
             let groups = {};
             items.forEach(item => {
                 const cat = getCategoryName(item.nama);
@@ -627,18 +624,9 @@
                 groups[cat].push(item);
             });
 
-            // Render Nested Card: Kategori -> Varian Item -> Rincian & Tabel
             Object.keys(groups).forEach(cat => {
                 const subItems = groups[cat];
                 const isCatOpen = !!openCategories[cat];
-
-                // Hitung total saldo kumulatif kategori
-                let totalCatSaldo = 0;
-                subItems.forEach(si => {
-                    const tp = processTransaksiList(si.transaksi || []);
-                    totalCatSaldo += tp.length > 0 ? tp[tp.length - 1].saldo : 0;
-                });
-                const satuanUtama = subItems[0]?.satuan || 'Pcs';
 
                 const catDiv = document.createElement('div');
                 catDiv.className = "bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition mb-3";
@@ -667,7 +655,7 @@
                                 </div>
                             </div>
 
-                            <!-- Rincian & Tabel Varian (Muncul Saat Varian Diklik) -->
+                            <!-- Rincian & Tabel Varian -->
                             <div class="${isItemOpen ? 'block' : 'hidden'} border-t border-slate-200 p-4 bg-white space-y-4">
                                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -759,7 +747,7 @@
                 });
 
                 catDiv.innerHTML = `
-                    <!-- Panel Kartu Utama Kategori (Contoh: Besi Beton 5 Type) -->
+                    <!-- Panel Utama Kategori (Hanya Nama Kategori & Jumlah Type) -->
                     <div onclick="toggleCategory('${cat}')" class="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition">
                         <div class="flex items-center space-x-3.5">
                             <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -767,7 +755,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-slate-900 text-sm sm:text-base">${cat}</h3>
-                                <p class="text-xs text-slate-500">${subItems.length} Type • Total Saldo: <strong class="text-blue-600 font-bold">${totalCatSaldo} ${satuanUtama}</strong></p>
+                                <p class="text-xs text-slate-500">${subItems.length} Type</p>
                             </div>
                         </div>
                         <div class="text-slate-400 hover:text-slate-600 p-2">
