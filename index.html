@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN (Visualisasi Dashboard) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SheetJS (xlsx) untuk Export/Import Excel Multi-Sheet -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Firebase SDK Modular (v10) -->
@@ -163,7 +165,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Dashboard Interaktif</h2>
-                    <p class="text-sm text-slate-500">Ringkasan status dan ketersediaan stok barang secara real-time.</p>
+                    <p class="text-sm text-slate-500">Ringkasan status, grafik analisis, dan ketersediaan stok barang secara real-time.</p>
                 </div>
                 <button onclick="loadData()" class="self-start sm:self-auto bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 shadow-sm transition flex items-center space-x-2 cursor-pointer">
                     <i class="fa-solid fa-rotate"></i>
@@ -171,6 +173,7 @@
                 </button>
             </div>
 
+            <!-- RINGKASAN KARTU KECIL -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div onclick="openDashboardModal('total')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 cursor-pointer transition flex items-center justify-between group">
                     <div>
@@ -206,6 +209,38 @@
                 </div>
             </div>
 
+            <!-- SECTION VISUALISASI GRAFIK ANALYSIS -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- CHART 1: GRAFIK TRANSAKSI BARANG (BATANG) -->
+                <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-simple text-blue-600"></i>
+                            <span>Grafik Transaksi Akumulatif Barang per Type</span>
+                        </h3>
+                        <span class="text-[11px] bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">Masuk vs Keluar</span>
+                    </div>
+                    <div class="relative w-full h-72 sm:h-80">
+                        <canvas id="chartTransaksiBarang"></canvas>
+                    </div>
+                </div>
+
+                <!-- CHART 2: GRAFIK DONUT SALDO (STOK) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-pie text-emerald-600"></i>
+                            <span>Proporsi Saldo Stok Barang</span>
+                        </h3>
+                        <span class="text-[11px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Saldo Akhir</span>
+                    </div>
+                    <div class="relative w-full h-72 sm:h-80 flex items-center justify-center">
+                        <canvas id="chartDonutSaldo"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABEL STATUS KETERSEDIAAN -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
                 <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
                     <i class="fa-solid fa-chart-column text-blue-600"></i>
@@ -387,6 +422,10 @@
         let openCategories = {}; 
         let openItems = {};      
 
+        // Variabel Instance Chart.js
+        let chartTransaksiInstance = null;
+        let chartDonutInstance = null;
+
         document.addEventListener('DOMContentLoaded', () => {
             setupSidebarEvents();
             const today = new Date().toISOString().split('T')[0];
@@ -501,10 +540,14 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             const target = document.getElementById('tab-' + tabId);
             if(target) target.classList.remove('hidden');
+            if (tabId === 'dashboard') {
+                renderDashboardCharts();
+            }
         }
 
         function renderAll() {
             renderDashboard();
+            renderDashboardCharts();
             renderBarangCards();
             renderStokTable();
         }
@@ -576,6 +619,105 @@
             document.getElementById('dashTotalJenis').innerText = totalJenis;
             document.getElementById('dashTotalTersedia').innerText = totalTersedia;
             document.getElementById('dashTotalHabis').innerText = totalHabis;
+        }
+
+        // FUNGSI VISUALISASI CHART (BAR CHART & DONUT CHART)
+        function renderDashboardCharts() {
+            const items = Object.values(appData.barang || {});
+            const labels = [];
+            const dataMasuk = [];
+            const dataKeluar = [];
+            const dataSaldo = [];
+
+            items.forEach(item => {
+                labels.push(item.nama);
+                const transProcessed = processTransaksiList(item.transaksi || []);
+                const lastTrans = transProcessed.length > 0 ? transProcessed[transProcessed.length - 1] : null;
+
+                const accMasuk = lastTrans ? lastTrans.akumulatifMasuk : 0;
+                const accKeluar = lastTrans ? lastTrans.akumulatifKeluar : 0;
+                const lastSaldo = lastTrans ? lastTrans.saldo : 0;
+
+                dataMasuk.push(accMasuk);
+                dataKeluar.push(accKeluar);
+                dataSaldo.push(lastSaldo > 0 ? lastSaldo : 0);
+            });
+
+            // 1. BAR CHART: TRANSAKSI MASUK vs KELUAR
+            const ctxBar = document.getElementById('chartTransaksiBarang');
+            if (ctxBar) {
+                if (chartTransaksiInstance) chartTransaksiInstance.destroy();
+
+                chartTransaksiInstance = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Akumulatif Penerimaan (Masuk)',
+                                data: dataMasuk,
+                                backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                                borderColor: '#10b981',
+                                borderWidth: 1,
+                                borderRadius: 6
+                            },
+                            {
+                                label: 'Akumulatif Pengeluaran (Keluar)',
+                                data: dataKeluar,
+                                backgroundColor: 'rgba(244, 63, 94, 0.85)',
+                                borderColor: '#f43f5e',
+                                borderWidth: 1,
+                                borderRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 11 } } },
+                            tooltip: { usePointStyle: true }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } },
+                            y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } } }
+                        }
+                    }
+                });
+            }
+
+            // 2. DOUGHNUT CHART: PROPORSI SALDO STOK
+            const ctxDonut = document.getElementById('chartDonutSaldo');
+            if (ctxDonut) {
+                if (chartDonutInstance) chartDonutInstance.destroy();
+
+                const donutColors = [
+                    '#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899',
+                    '#06b6d4', '#84cc16', '#6366f1', '#d97706', '#14b8a6'
+                ];
+
+                chartDonutInstance = new Chart(ctxDonut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: dataSaldo,
+                            backgroundColor: donutColors.slice(0, labels.length),
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 10 }, boxWidth: 12 } },
+                            tooltip: { usePointStyle: true }
+                        },
+                        cutout: '65%'
+                    }
+                });
+            }
         }
 
         function getCategoryName(namaBarang) {
