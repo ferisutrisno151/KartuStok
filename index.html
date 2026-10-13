@@ -34,7 +34,6 @@
         window.fbSet = set;
         window.fbGet = get;
 
-        // Trigger initialization setelah Firebase siap
         if (window.initAppAfterFirebase) {
             window.initAppAfterFirebase();
         }
@@ -85,12 +84,12 @@
         </div>
     </header>
 
-    <!-- SIDEBAR OVERLAY -->
+    <!-- SIDEBAR OVERLAY (BIRU DONGKER) -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden transition-opacity opacity-0"></div>
-    <aside id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-slate-900 text-slate-100 shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950 text-white">
             <div class="flex items-center space-x-2.5">
-                <div class="bg-blue-500 p-2 rounded-lg text-white">
+                <div class="bg-blue-600 p-2 rounded-lg text-white">
                     <i class="fa-solid fa-compass text-sm"></i>
                 </div>
                 <span class="font-bold text-base">Menu & Konfigurasi</span>
@@ -105,40 +104,31 @@
             <div>
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Navigasi Utama</h3>
                 <nav class="space-y-1">
-                    <button onclick="switchTab('dashboard'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition cursor-pointer">
+                    <button onclick="switchTab('dashboard'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-blue-400 transition cursor-pointer">
                         <i class="fa-solid fa-chart-pie w-5 text-center"></i>
                         <span>Dashboard Interaktif</span>
                     </button>
-                    <button onclick="switchTab('barang'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition cursor-pointer">
+                    <button onclick="switchTab('barang'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-blue-400 transition cursor-pointer">
                         <i class="fa-solid fa-boxes-stacked w-5 text-center"></i>
                         <span>Nama Barang & Kartu Stok</span>
                     </button>
-                    <button onclick="switchTab('stok'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition cursor-pointer">
+                    <button onclick="switchTab('stok'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-blue-400 transition cursor-pointer">
                         <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
                         <span>Stok Barang (Rekap)</span>
                     </button>
                 </nav>
             </div>
 
-            <!-- Firebase Info Banner -->
-            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
-                <h3 class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1 flex items-center justify-between">
-                    <span>Database Aktif</span>
-                    <i class="fa-solid fa-cloud text-emerald-600"></i>
-                </h3>
-                <p class="text-xs text-emerald-700">Terhubung ke project <strong>kartustok-d85f9</strong>. Data otomatis tersinkron dan dapat diedit bersama.</p>
-            </div>
-
             <!-- Backup & Restore JSON -->
             <div>
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Backup & Restore JSON</h3>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="exportJSON()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-1.5 cursor-pointer">
-                        <i class="fa-solid fa-download text-slate-500"></i>
+                    <button onclick="exportJSON()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                        <i class="fa-solid fa-download text-slate-400"></i>
                         <span>Download JSON</span>
                     </button>
-                    <label class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-1.5 cursor-pointer">
-                        <i class="fa-solid fa-upload text-slate-500"></i>
+                    <label class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                        <i class="fa-solid fa-upload text-slate-400"></i>
                         <span>Import JSON</span>
                         <input type="file" id="importJsonFile" accept=".json" class="hidden" onchange="importJSON(event)">
                     </label>
@@ -149,11 +139,11 @@
             <div>
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Bagikan Aplikasi</h3>
                 <div class="space-y-2">
-                    <button onclick="shareLink()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer">
+                    <button onclick="shareLink()" class="w-full bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-indigo-800">
                         <i class="fa-solid fa-share-nodes"></i>
                         <span>Share Link Aplikasi</span>
                     </button>
-                    <button onclick="downloadAppHTML()" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer">
+                    <button onclick="downloadAppHTML()" class="w-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-emerald-800">
                         <i class="fa-solid fa-code"></i>
                         <span>Download File HTML Ini</span>
                     </button>
@@ -162,10 +152,10 @@
         </div>
 
         <!-- Identitas Pembuat -->
-        <div class="p-4 border-t border-slate-100 bg-slate-50 text-center">
-            <p class="text-xs font-bold text-slate-800">Feri Sutrisno</p>
-            <p class="text-[11px] text-slate-500">Warehouse & Material Control Supervisor</p>
-            <p class="text-[10px] text-blue-600 font-medium mt-1">LogistikPRO System © 2026</p>
+        <div class="p-4 border-t border-slate-800 bg-slate-950 text-center">
+            <p class="text-xs font-bold text-slate-200">Feri Sutrisno</p>
+            <p class="text-[11px] text-slate-400">Warehouse & Material Control Supervisor</p>
+            <p class="text-[10px] text-blue-400 font-medium mt-1">LogistikPRO System © 2026</p>
         </div>
     </aside>
 
@@ -221,14 +211,14 @@
                 </div>
             </div>
 
-            <!-- Quick Summary Table Preview -->
+            <!-- Quick Summary Table Preview (Memanjang / No-Wrap) -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
                 <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center space-x-2">
                     <i class="fa-solid fa-chart-column text-blue-600"></i>
                     <span>Status Ketersediaan Stok Terkini</span>
                 </h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
+                    <table class="w-full text-left text-sm text-slate-600 no-wrap-table">
                         <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-200">
                             <tr>
                                 <th class="px-4 py-3">Nama Barang</th>
@@ -292,16 +282,17 @@
 
     </main>
 
-    <!-- MODAL 1: TAMBAH NAMA BARANG -->
+    <!-- MODAL 1: TAMBAH / EDIT NAMA BARANG -->
     <div id="modalAddBarang" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-slate-900 text-lg">Tambah Nama Barang Baru</h3>
+                <h3 id="modalBarangTitle" class="font-bold text-slate-900 text-lg">Tambah Nama Barang Baru</h3>
                 <button onclick="closeAddBarangModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             <form id="formAddBarang" onsubmit="saveBarang(event)" class="space-y-4">
+                <input type="hidden" id="editBarangId">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Barang</label>
                     <input type="text" id="inputNamaBarang" required class="w-full text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500" placeholder="Contoh: Pipa Besi 4 inch">
@@ -386,7 +377,7 @@
                 </button>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600">
+                <table class="w-full text-left text-sm text-slate-600 no-wrap-table">
                     <thead id="dashModalHead" class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-200">
                     </thead>
                     <tbody id="dashModalBody" class="divide-y divide-slate-100">
@@ -414,7 +405,6 @@
                 if (val) {
                     appData = val;
                 } else {
-                    // Default data awal jika kosong
                     appData = {
                         barang: {
                             "item_1": {
@@ -628,11 +618,14 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="openAddTransaksiModal('${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5 cursor-pointer">
+                            <button onclick="openAddTransaksiModal('${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5 cursor-pointer">
                                 <i class="fa-solid fa-plus"></i>
                                 <span>Input Transaksi</span>
                             </button>
-                            <button onclick="deleteBarang('${item.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold p-2 rounded-xl transition cursor-pointer" title="Hapus Barang">
+                            <button onclick="openEditBarangModal('${item.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 text-xs font-semibold p-2.5 rounded-xl transition cursor-pointer" title="Edit Barang">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteBarang('${item.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold p-2.5 rounded-xl transition cursor-pointer" title="Hapus Barang">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -663,10 +656,10 @@
                                     <tr>
                                         <td class="px-3.5 py-3 font-medium text-slate-800">${t.tanggal}</td>
                                         <td class="px-3.5 py-3">${t.noGr || '-'}</td>
-                                        <td class="px-3.5 py-3 font-semibold text-emerald-600">${t.penerimaan > 0 ? '+' + t.penerimaan : '-'}</td>
+                                        <td class="px-3.5 py-3 font-semibold text-emerald-600">${t.penerimaan > 0 ? t.penerimaan : '-'}</td>
                                         <td class="px-3.5 py-3 font-medium text-slate-700">${t.akumulatifMasuk}</td>
                                         <td class="px-3.5 py-3">${t.noTiket || '-'}</td>
-                                        <td class="px-3.5 py-3 font-semibold text-rose-600">${t.pengeluaran > 0 ? '-' + t.pengeluaran : '-'}</td>
+                                        <td class="px-3.5 py-3 font-semibold text-rose-600">${t.pengeluaran > 0 ? t.pengeluaran : '-'}</td>
                                         <td class="px-3.5 py-3 font-medium text-slate-700">${t.akumulatifKeluar}</td>
                                         <td class="px-3.5 py-3 font-bold text-slate-900">${t.saldo}${item.satuan}</td>
                                         <td class="px-3.5 py-3 text-slate-500">${t.keterangan || '-'}</td>
@@ -723,23 +716,48 @@
 
         function openAddBarangModal() {
             document.getElementById('formAddBarang').reset();
+            document.getElementById('editBarangId').value = '';
+            document.getElementById('modalBarangTitle').innerText = 'Tambah Nama Barang Baru';
             document.getElementById('modalAddBarang').classList.remove('hidden');
         }
+
+        function openEditBarangModal(barangId) {
+            const item = appData.barang[barangId];
+            if (!item) return;
+            document.getElementById('editBarangId').value = item.id;
+            document.getElementById('inputNamaBarang').value = item.nama;
+            document.getElementById('inputAsalBarang').value = item.asal;
+            document.getElementById('inputUkuran').value = item.ukuran;
+            document.getElementById('inputSatuan').value = item.satuan;
+            document.getElementById('modalBarangTitle').innerText = 'Edit Nama Barang';
+            document.getElementById('modalAddBarang').classList.remove('hidden');
+        }
+
         function closeAddBarangModal() {
             document.getElementById('modalAddBarang').classList.add('hidden');
         }
 
         function saveBarang(e) {
             e.preventDefault();
+            const editId = document.getElementById('editBarangId').value;
             const nama = document.getElementById('inputNamaBarang').value.trim();
             const asal = document.getElementById('inputAsalBarang').value.trim();
             const ukuran = document.getElementById('inputUkuran').value.trim();
             const satuan = document.getElementById('inputSatuan').value.trim();
 
-            const id = 'item_' + Date.now();
             if (!appData.barang) appData.barang = {};
 
-            appData.barang[id] = { id, nama, asal, ukuran, satuan, transaksi: [] };
+            if (editId) {
+                // Update existing
+                appData.barang[editId].nama = nama;
+                appData.barang[editId].asal = asal;
+                appData.barang[editId].ukuran = ukuran;
+                appData.barang[editId].satuan = satuan;
+            } else {
+                // Create new
+                const id = 'item_' + Date.now();
+                appData.barang[id] = { id, nama, asal, ukuran, satuan, transaksi: [] };
+            }
 
             saveDataStorage();
             closeAddBarangModal();
