@@ -1247,12 +1247,13 @@
         }
 
         function downloadAPK() {
-    // Jalur file APK di GitHub Pages Anda
-    const apkUrl = "./StockOpname.apk"; 
+    // Menggunakan URL lengkap langsung ke file di GitHub Pages
+    const apkUrl = "https://ferisutrisno151.github.io/KartuStok/StockOpname.apk";
     
     const a = document.createElement('a');
     a.href = apkUrl;
     a.download = "StockOpname.apk";
+    a.target = "_blank"; // Buka tab baru jika browser memblokir download langsung
     document.body.appendChild(a);
     a.click();
     a.remove();
