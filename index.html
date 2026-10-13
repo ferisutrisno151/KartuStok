@@ -246,19 +246,19 @@
                     <i class="fa-solid fa-chart-column text-blue-600"></i>
                     <span>Status Ketersediaan Stok Terkini</span>
                 </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600 no-wrap-table">
-                        <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-200">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-sm text-slate-600 no-wrap-table border-collapse">
+                        <thead class="bg-slate-100 text-slate-700 text-xs uppercase font-semibold">
                             <tr>
-                                <th class="px-4 py-3">Nama Barang</th>
-                                <th class="px-4 py-3">Asal Barang</th>
-                                <th class="px-4 py-3">No. Kode / Ukuran</th>
-                                <th class="px-4 py-3">Satuan</th>
-                                <th class="px-4 py-3">Saldo Akhir</th>
-                                <th class="px-4 py-3">Status</th>
+                                <th class="px-4 py-3 border-b border-r border-slate-200">Nama Barang</th>
+                                <th class="px-4 py-3 border-b border-r border-slate-200">Asal Barang</th>
+                                <th class="px-4 py-3 border-b border-r border-slate-200">No. Kode / Ukuran</th>
+                                <th class="px-4 py-3 border-b border-r border-slate-200">Satuan</th>
+                                <th class="px-4 py-3 border-b border-r border-slate-200">Saldo Akhir</th>
+                                <th class="px-4 py-3 border-b border-slate-200">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="dashTableBody" class="divide-y divide-slate-100">
+                        <tbody id="dashTableBody" class="divide-y divide-slate-200">
                         </tbody>
                     </table>
                 </div>
@@ -289,20 +289,20 @@
                 <p class="text-sm text-slate-500">Rekapitulasi otomatis ketersediaan stok terhubung langsung dengan kartu transaksi.</p>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600 no-wrap-table">
-                        <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-200">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-4">
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-sm text-slate-600 no-wrap-table border-collapse">
+                        <thead class="bg-slate-100 text-slate-700 text-xs uppercase font-semibold">
                             <tr>
-                                <th class="px-4 py-3.5">Tanggal Update</th>
-                                <th class="px-4 py-3.5">Nama Barang</th>
-                                <th class="px-4 py-3.5">Ukuran / Kode</th>
-                                <th class="px-4 py-3.5">Satuan</th>
-                                <th class="px-4 py-3.5">Saldo Akhir</th>
-                                <th class="px-4 py-3.5">Status</th>
+                                <th class="px-4 py-3.5 border-b border-r border-slate-200">Tanggal Update</th>
+                                <th class="px-4 py-3.5 border-b border-r border-slate-200">Nama Barang</th>
+                                <th class="px-4 py-3.5 border-b border-r border-slate-200">Ukuran / Kode</th>
+                                <th class="px-4 py-3.5 border-b border-r border-slate-200">Satuan</th>
+                                <th class="px-4 py-3.5 border-b border-r border-slate-200">Saldo Akhir</th>
+                                <th class="px-4 py-3.5 border-b border-slate-200">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="stokTableBody" class="divide-y divide-slate-100">
+                        <tbody id="stokTableBody" class="divide-y divide-slate-200">
                         </tbody>
                     </table>
                 </div>
@@ -405,11 +405,11 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600 no-wrap-table">
-                    <thead id="dashModalHead" class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-200">
+            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-left text-sm text-slate-600 no-wrap-table border-collapse">
+                    <thead id="dashModalHead" class="bg-slate-100 text-slate-700 text-xs uppercase font-semibold">
                     </thead>
-                    <tbody id="dashModalBody" class="divide-y divide-slate-100">
+                    <tbody id="dashModalBody" class="divide-y divide-slate-200">
                     </tbody>
                 </table>
             </div>
@@ -422,7 +422,6 @@
         let openCategories = {}; 
         let openItems = {};      
 
-        // Variabel Instance Chart.js
         let chartTransaksiInstance = null;
         let chartDonutInstance = null;
 
@@ -600,13 +599,13 @@
                 else totalHabis++;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition";
+                tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="px-4 py-3 font-semibold text-slate-900">${item.nama}</td>
-                    <td class="px-4 py-3">${item.asal}</td>
-                    <td class="px-4 py-3">${item.ukuran}</td>
-                    <td class="px-4 py-3">${item.satuan}</td>
-                    <td class="px-4 py-3 font-bold text-slate-800">${lastSaldo} ${item.satuan}</td>
+                    <td class="px-4 py-3 font-semibold text-slate-900 border-r border-slate-200">${item.nama}</td>
+                    <td class="px-4 py-3 border-r border-slate-200">${item.asal}</td>
+                    <td class="px-4 py-3 border-r border-slate-200">${item.ukuran}</td>
+                    <td class="px-4 py-3 border-r border-slate-200">${item.satuan}</td>
+                    <td class="px-4 py-3 font-bold text-slate-800 border-r border-slate-200">${lastSaldo} ${item.satuan}</td>
                     <td class="px-4 py-3">
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${isTersedia ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
                             ${isTersedia ? 'Tersedia' : 'Habis'}
@@ -621,7 +620,6 @@
             document.getElementById('dashTotalHabis').innerText = totalHabis;
         }
 
-        // FUNGSI VISUALISASI CHART (BAR CHART & DONUT CHART)
         function renderDashboardCharts() {
             const items = Object.values(appData.barang || {});
             const labels = [];
@@ -643,7 +641,6 @@
                 dataSaldo.push(lastSaldo > 0 ? lastSaldo : 0);
             });
 
-            // 1. BAR CHART: TRANSAKSI MASUK vs KELUAR
             const ctxBar = document.getElementById('chartTransaksiBarang');
             if (ctxBar) {
                 if (chartTransaksiInstance) chartTransaksiInstance.destroy();
@@ -686,7 +683,6 @@
                 });
             }
 
-            // 2. DOUGHNUT CHART: PROPORSI SALDO STOK
             const ctxDonut = document.getElementById('chartDonutSaldo');
             if (ctxDonut) {
                 if (chartDonutInstance) chartDonutInstance.destroy();
@@ -834,41 +830,41 @@
                                     </div>
                                 </div>
 
-                                <!-- Tabel Kartu Stok Harian -->
+                                <!-- Tabel Kartu Stok Harian (Dengan Border Grid Lengkap) -->
                                 <div class="space-y-2">
                                     <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Tabel Kartu Stok Harian</span>
                                     <div class="overflow-x-auto bg-white rounded-xl border border-slate-200">
-                                        <table class="w-full text-left text-xs sm:text-sm text-slate-600 no-wrap-table">
-                                            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                                        <table class="w-full text-left text-xs sm:text-sm text-slate-600 no-wrap-table border-collapse">
+                                            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold">
                                                 <tr>
-                                                    <th class="px-3.5 py-3">Tanggal</th>
-                                                    <th class="px-3.5 py-3">No. GR</th>
-                                                    <th class="px-3.5 py-3">Penerimaan</th>
-                                                    <th class="px-3.5 py-3">Akumulatif (Masuk)</th>
-                                                    <th class="px-3.5 py-3">No. Tiket</th>
-                                                    <th class="px-3.5 py-3">Pengeluaran</th>
-                                                    <th class="px-3.5 py-3">Akumulatif (Keluar)</th>
-                                                    <th class="px-3.5 py-3">Saldo</th>
-                                                    <th class="px-3.5 py-3">Keterangan</th>
-                                                    <th class="px-3.5 py-3 text-center">Aksi</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">Tanggal</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">No. GR</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">Penerimaan</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">Akumulatif (Masuk)</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">No. Tiket</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">Pengeluaran</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">Akumulatif (Keluar)</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">Saldo</th>
+                                                    <th class="px-3.5 py-3 border-b border-r border-slate-200">Keterangan</th>
+                                                    <th class="px-3.5 py-3 border-b border-slate-200 text-center">Aksi</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="divide-y divide-slate-100">
+                                            <tbody class="divide-y divide-slate-200">
                                                 ${transProcessed.length === 0 ? `
                                                     <tr>
                                                         <td colspan="10" class="text-center py-4 text-slate-400">Belum ada transaksi harian untuk barang ini.</td>
                                                     </tr>
                                                 ` : transProcessed.map((t, tIndex) => `
                                                     <tr>
-                                                        <td class="px-3.5 py-3 font-medium text-slate-800">${t.tanggal}</td>
-                                                        <td class="px-3.5 py-3">${t.noGr || '-'}</td>
-                                                        <td class="px-3.5 py-3 font-semibold text-emerald-600">${t.penerimaan > 0 ? t.penerimaan : '-'}</td>
-                                                        <td class="px-3.5 py-3 font-medium text-slate-700">${t.akumulatifMasuk}</td>
-                                                        <td class="px-3.5 py-3">${t.noTiket || '-'}</td>
-                                                        <td class="px-3.5 py-3 font-semibold text-rose-600">${t.pengeluaran > 0 ? t.pengeluaran : '-'}</td>
-                                                        <td class="px-3.5 py-3 font-medium text-slate-700">${t.akumulatifKeluar}</td>
-                                                        <td class="px-3.5 py-3 font-bold text-slate-900">${t.saldo}${item.satuan}</td>
-                                                        <td class="px-3.5 py-3 text-slate-500">${t.keterangan || '-'}</td>
+                                                        <td class="px-3.5 py-3 font-medium text-slate-800 border-r border-slate-200">${t.tanggal}</td>
+                                                        <td class="px-3.5 py-3 border-r border-slate-200">${t.noGr || '-'}</td>
+                                                        <td class="px-3.5 py-3 font-semibold text-emerald-600 border-r border-slate-200">${t.penerimaan > 0 ? t.penerimaan : '-'}</td>
+                                                        <td class="px-3.5 py-3 font-medium text-slate-700 border-r border-slate-200">${t.akumulatifMasuk}</td>
+                                                        <td class="px-3.5 py-3 border-r border-slate-200">${t.noTiket || '-'}</td>
+                                                        <td class="px-3.5 py-3 font-semibold text-rose-600 border-r border-slate-200">${t.pengeluaran > 0 ? t.pengeluaran : '-'}</td>
+                                                        <td class="px-3.5 py-3 font-medium text-slate-700 border-r border-slate-200">${t.akumulatifKeluar}</td>
+                                                        <td class="px-3.5 py-3 font-bold text-slate-900 border-r border-slate-200">${t.saldo}${item.satuan}</td>
+                                                        <td class="px-3.5 py-3 text-slate-500 border-r border-slate-200">${t.keterangan || '-'}</td>
                                                         <td class="px-3.5 py-3 text-center flex items-center justify-center space-x-2">
                                                             <button onclick="openEditTransaksiModal('${item.id}',${tIndex})" class="text-amber-500 hover:text-amber-700 p-1 cursor-pointer" title="Edit Baris">
                                                                 <i class="fa-solid fa-pen-to-square"></i>
@@ -889,7 +885,7 @@
                 });
 
                 catDiv.innerHTML = `
-                    <!-- Panel Utama Kategori (Hanya Nama Kategori & Jumlah Type) -->
+                    <!-- Panel Utama Kategori -->
                     <div onclick="toggleCategory('${cat}')" class="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition">
                         <div class="flex items-center space-x-3.5">
                             <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -933,13 +929,13 @@
                 const isTersedia = lastSaldo > 0;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition";
+                tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="px-4 py-3.5 font-medium text-slate-800">${lastTanggal}</td>
-                    <td class="px-4 py-3.5 font-bold text-slate-900">${item.nama}</td>
-                    <td class="px-4 py-3.5">${item.ukuran}</td>
-                    <td class="px-4 py-3.5">${item.satuan}</td>
-                    <td class="px-4 py-3.5 font-extrabold text-slate-900">${lastSaldo} ${item.satuan}</td>
+                    <td class="px-4 py-3.5 font-medium text-slate-800 border-r border-slate-200">${lastTanggal}</td>
+                    <td class="px-4 py-3.5 font-bold text-slate-900 border-r border-slate-200">${item.nama}</td>
+                    <td class="px-4 py-3.5 border-r border-slate-200">${item.ukuran}</td>
+                    <td class="px-4 py-3.5 border-r border-slate-200">${item.satuan}</td>
+                    <td class="px-4 py-3.5 font-extrabold text-slate-900 border-r border-slate-200">${lastSaldo} ${item.satuan}</td>
                     <td class="px-4 py-3.5">
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${isTersedia ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
                             ${isTersedia ? 'Tersedia' : 'Habis'}
@@ -1077,28 +1073,28 @@
 
             if (type === 'total') {
                 modalTitle.innerText = "Rincian Total Jenis Barang";
-                modalHead.innerHTML = `<tr><th class="px-4 py-3">Nama Barang</th><th class="px-4 py-3">Asal</th><th class="px-4 py-3">Ukuran</th><th class="px-4 py-3">Satuan</th></tr>`;
+                modalHead.innerHTML = `<tr><th class="px-4 py-3 border-r border-slate-200">Nama Barang</th><th class="px-4 py-3 border-r border-slate-200">Asal</th><th class="px-4 py-3 border-r border-slate-200">Ukuran</th><th class="px-4 py-3">Satuan</th></tr>`;
                 items.forEach(i => {
-                    modalBody.innerHTML += `<tr><td class="px-4 py-3 font-bold">${i.nama}</td><td class="px-4 py-3">${i.asal}</td><td class="px-4 py-3">${i.ukuran}</td><td class="px-4 py-3">${i.satuan}</td></tr>`;
+                    modalBody.innerHTML += `<tr><td class="px-4 py-3 font-bold border-r border-slate-200">${i.nama}</td><td class="px-4 py-3 border-r border-slate-200">${i.asal}</td><td class="px-4 py-3 border-r border-slate-200">${i.ukuran}</td><td class="px-4 py-3">${i.satuan}</td></tr>`;
                 });
             } else if (type === 'tersedia') {
                 modalTitle.innerText = "Rincian Barang Tersedia";
-                modalHead.innerHTML = `<tr><th class="px-4 py-3">Nama Barang</th><th class="px-4 py-3">Ukuran</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Saldo</th></tr>`;
+                modalHead.innerHTML = `<tr><th class="px-4 py-3 border-r border-slate-200">Nama Barang</th><th class="px-4 py-3 border-r border-slate-200">Ukuran</th><th class="px-4 py-3 border-r border-slate-200">Status</th><th class="px-4 py-3">Saldo</th></tr>`;
                 items.forEach(i => {
                     const trans = processTransaksiList(i.transaksi || []);
                     const saldo = trans.length > 0 ? trans[trans.length - 1].saldo : 0;
                     if (saldo > 0) {
-                        modalBody.innerHTML += `<tr><td class="px-4 py-3 font-bold">${i.nama}</td><td class="px-4 py-3">${i.ukuran}</td><td class="px-4 py-3"><span class="text-xs font-semibold bg-emerald-50 text-emerald-700 px-2 py-1 rounded">Tersedia</span></td><td class="px-4 py-3 font-bold">${saldo} ${i.satuan}</td></tr>`;
+                        modalBody.innerHTML += `<tr><td class="px-4 py-3 font-bold border-r border-slate-200">${i.nama}</td><td class="px-4 py-3 border-r border-slate-200">${i.ukuran}</td><td class="px-4 py-3 border-r border-slate-200"><span class="text-xs font-semibold bg-emerald-50 text-emerald-700 px-2 py-1 rounded">Tersedia</span></td><td class="px-4 py-3 font-bold">${saldo} ${i.satuan}</td></tr>`;
                     }
                 });
             } else if (type === 'habis') {
                 modalTitle.innerText = "Rincian Barang Habis";
-                modalHead.innerHTML = `<tr><th class="px-4 py-3">Nama Barang</th><th class="px-4 py-3">Ukuran</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Saldo</th></tr>`;
+                modalHead.innerHTML = `<tr><th class="px-4 py-3 border-r border-slate-200">Nama Barang</th><th class="px-4 py-3 border-r border-slate-200">Ukuran</th><th class="px-4 py-3 border-r border-slate-200">Status</th><th class="px-4 py-3">Saldo</th></tr>`;
                 items.forEach(i => {
                     const trans = processTransaksiList(i.transaksi || []);
                     const saldo = trans.length > 0 ? trans[trans.length - 1].saldo : 0;
                     if (saldo <= 0) {
-                        modalBody.innerHTML += `<tr><td class="px-4 py-3 font-bold">${i.nama}</td><td class="px-4 py-3">${i.ukuran}</td><td class="px-4 py-3"><span class="text-xs font-semibold bg-rose-50 text-rose-700 px-2 py-1 rounded">Habis</span></td><td class="px-4 py-3 font-bold">${saldo} ${i.satuan}</td></tr>`;
+                        modalBody.innerHTML += `<tr><td class="px-4 py-3 font-bold border-r border-slate-200">${i.nama}</td><td class="px-4 py-3 border-r border-slate-200">${i.ukuran}</td><td class="px-4 py-3 border-r border-slate-200"><span class="text-xs font-semibold bg-rose-50 text-rose-700 px-2 py-1 rounded">Habis</span></td><td class="px-4 py-3 font-bold">${saldo} ${i.satuan}</td></tr>`;
                     }
                 });
             }
