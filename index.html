@@ -72,16 +72,6 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span id="syncText">Firebase Terhubung</span>
                 </div>
-                
-                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5 cursor-pointer">
-                    <i class="fa-solid fa-file-excel"></i>
-                    <span class="hidden sm:inline">Export Excel</span>
-                </button>
-                <label class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-xl shadow-sm cursor-pointer transition flex items-center space-x-1.5">
-                    <i class="fa-solid fa-file-import"></i>
-                    <span class="hidden sm:inline">Import Excel</span>
-                    <input type="file" id="importExcelFile" accept=".xlsx, .xls" class="hidden" onchange="importFromExcel(event)">
-                </label>
             </div>
         </div>
     </header>
@@ -749,7 +739,7 @@
                     <div class="text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
                         <i class="fa-solid fa-box-open text-slate-300 text-4xl mb-3"></i>
                         <p class="text-slate-600 font-medium">Belum ada data barang.</p>
-                        <p class="text-xs text-slate-400 mt-1">Klik tombol "Tambah Nama Barang Baru" di atas.</p>
+                        <p class="text-xs text-slate-400 mt-1">Gunakan menu di atas untuk menambah data baru.</p>
                     </div>
                 `;
                 return;
@@ -830,7 +820,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Tabel Kartu Stok Harian (Dengan Border Grid Lengkap) -->
+                                <!-- Tabel Kartu Stok Harian -->
                                 <div class="space-y-2">
                                     <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Tabel Kartu Stok Harian</span>
                                     <div class="overflow-x-auto bg-white rounded-xl border border-slate-200">
@@ -885,9 +875,9 @@
                 });
 
                 catDiv.innerHTML = `
-                    <!-- Panel Utama Kategori -->
-                    <div onclick="toggleCategory('${cat}')" class="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition">
-                        <div class="flex items-center space-x-3.5">
+                    <!-- Panel Utama Kategori (Dilengkapi Tombol Export & Import Excel per Panel) -->
+                    <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white hover:bg-slate-50/50 transition">
+                        <div onclick="toggleCategory('${cat}')" class="flex items-center space-x-3.5 cursor-pointer flex-1">
                             <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
                                 <i class="fa-solid fa-layer-group text-base"></i>
                             </div>
@@ -896,8 +886,19 @@
                                 <p class="text-xs text-slate-500">${subItems.length} Type</p>
                             </div>
                         </div>
-                        <div class="text-slate-400 hover:text-slate-600 p-2">
-                            <i class="fa-solid fa-chevron-${isCatOpen ? 'up' : 'down'} text-sm"></i>
+                        <div class="flex items-center space-x-2 self-end sm:self-auto">
+                            <button onclick="exportCategoryExcel('${cat}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5 cursor-pointer">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>Export Excel</span>
+                            </button>
+                            <label class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm cursor-pointer transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-file-import"></i>
+                                <span>Import Excel</span>
+                                <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importCategoryExcel(event, '${cat}')">
+                            </label>
+                            <div onclick="toggleCategory('${cat}')" class="text-slate-400 hover:text-slate-600 p-2 cursor-pointer">
+                                <i class="fa-solid fa-chevron-${isCatOpen ? 'up' : 'down'} text-sm"></i>
+                            </div>
                         </div>
                     </div>
 
@@ -1064,6 +1065,107 @@
             }
         }
 
+        // FUNGSI EXPORT EXCEL KHUSUS PER PANEL KATEGORI (MULTI-SHEET PER TYPE)
+        function exportCategoryExcel(catName) {
+            const wb = XLSX.utils.book_new();
+            const items = Object.values(appData.barang || {}).filter(i => getCategoryName(i.nama) === catName);
+
+            if (items.length === 0) {
+                alert('Tidak ada data untuk kategori ini.');
+                return;
+            }
+
+            items.forEach(item => {
+                const transProcessed = processTransaksiList(item.transaksi || []);
+                const sheetData = [
+                    ["KARTU STOK HARIAN - " + item.nama.toUpperCase()],
+                    ["Asal:", item.asal, "Ukuran:", item.ukuran, "Satuan:", item.satuan],
+                    [],
+                    ["Tanggal", "No. GR", "Penerimaan", "Akumulatif (Masuk)", "No. Tiket", "Pengeluaran", "Akumulatif (Keluar)", "Saldo", "Keterangan"]
+                ];
+                transProcessed.forEach(t => {
+                    sheetData.push([t.tanggal, t.noGr || "", t.penerimaan, t.akumulatifMasuk, t.noTiket || "", t.pengeluaran, t.akumulatifKeluar, t.saldo, t.keterangan || ""]);
+                });
+                const ws = XLSX.utils.aoa_to_sheet(sheetData);
+                // Nama sheet maksimal 31 karakter dan tidak boleh mengandung karakter khusus terlarang
+                const sheetName = item.nama.substring(0, 31).replace(/[:\\\/?*\[\]]/g, "_");
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            });
+
+            const fileName = `Kartu_Stok_${catName.replace(/\s+/g, '_')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        // FUNGSI IMPORT EXCEL KHUSUS PER PANEL KATEGORI
+        function importCategoryExcel(e, catName) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    if (!appData.barang) appData.barang = {};
+
+                    workbook.SheetNames.forEach(sheetName => {
+                        const ws = workbook.Sheets[sheetName];
+                        const jsonRows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        if (jsonRows.length > 1) {
+                            let asal = jsonRows[1]?.[1] || "Import";
+                            let ukuran = jsonRows[1]?.[3] || "-";
+                            let satuan = jsonRows[1]?.[5] || "Pcs";
+                            let transaksiList = [];
+                            let startIdx = 4;
+                            for (let i = 0; i < jsonRows.length; i++) {
+                                if (jsonRows[i].includes("Tanggal")) { startIdx = i + 1; break; }
+                            }
+                            for (let i = startIdx; i < jsonRows.length; i++) {
+                                const row = jsonRows[i];
+                                if (row && row[0]) {
+                                    transaksiList.push({
+                                        tanggal: row[0],
+                                        noGr: row[1] || "",
+                                        penerimaan: parseFloat(row[2]) || 0,
+                                        noTiket: row[4] || "",
+                                        pengeluaran: parseFloat(row[5]) || 0,
+                                        keterangan: row[8] || ""
+                                    });
+                                }
+                            }
+
+                            // Cari apakah item dengan nama sheet ini sudah ada, jika belum buat baru
+                            let existingId = null;
+                            Object.keys(appData.barang).forEach(id => {
+                                if (appData.barang[id].nama.toLowerCase() === sheetName.toLowerCase()) {
+                                    existingId = id;
+                                }
+                            });
+
+                            if (existingId) {
+                                appData.barang[existingId].transaksi = transaksiList;
+                                appData.barang[existingId].asal = asal;
+                                appData.barang[existingId].ukuran = ukuran;
+                                appData.barang[existingId].satuan = satuan;
+                            } else {
+                                const id = 'item_' + Math.random().toString(36).substring(2, 9);
+                                appData.barang[id] = { id, nama: sheetName, asal, ukuran, satuan, transaksi: transaksiList };
+                            }
+                        }
+                    });
+
+                    saveDataStorage();
+                    openCategories[catName] = true;
+                    alert(`Import Excel untuk kategori ${catName} berhasil!`);
+                } catch(err) {
+                    console.error(err);
+                    alert('Gagal membaca file Excel.');
+                }
+                e.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
         function openDashboardModal(type) {
             const items = Object.values(appData.barang || {});
             const modalTitle = document.getElementById('dashModalTitle');
@@ -1103,83 +1205,6 @@
 
         function closeDashboardModal() {
             document.getElementById('modalDashboardDetail').classList.add('hidden');
-        }
-
-        function exportToExcel() {
-            const wb = XLSX.utils.book_new();
-            const items = Object.values(appData.barang || {});
-            if (items.length === 0) {
-                alert('Tidak ada data.');
-                return;
-            }
-            items.forEach(item => {
-                const transProcessed = processTransaksiList(item.transaksi || []);
-                const sheetData = [
-                    ["KARTU STOK HARIAN - " + item.nama.toUpperCase()],
-                    ["Asal:", item.asal, "Ukuran:", item.ukuran, "Satuan:", item.satuan],
-                    [],
-                    ["Tanggal", "No. GR", "Penerimaan", "Akumulatif (Masuk)", "No. Tiket", "Pengeluaran", "Akumulatif (Keluar)", "Saldo", "Keterangan"]
-                ];
-                transProcessed.forEach(t => {
-                    sheetData.push([t.tanggal, t.noGr || "", t.penerimaan, t.akumulatifMasuk, t.noTiket || "", t.pengeluaran, t.akumulatifKeluar, t.saldo, t.keterangan || ""]);
-                });
-                const ws = XLSX.utils.aoa_to_sheet(sheetData);
-                XLSX.utils.book_append_sheet(wb, ws, item.nama.substring(0, 31).replace(/[:\\\/?*\[\]]/g, "_"));
-            });
-            XLSX.writeFile(wb, "Kartu_Stok_Harian.xlsx");
-        }
-
-        function importFromExcel(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    let newBarangObj = {};
-
-                    workbook.SheetNames.forEach(sheetName => {
-                        const ws = workbook.Sheets[sheetName];
-                        const jsonRows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                        if (jsonRows.length > 1) {
-                            let asal = jsonRows[1]?.[1] || "Import";
-                            let ukuran = jsonRows[1]?.[3] || "-";
-                            let satuan = jsonRows[1]?.[5] || "Pcs";
-                            let transaksiList = [];
-                            let startIdx = 4;
-                            for (let i = 0; i < jsonRows.length; i++) {
-                                if (jsonRows[i].includes("Tanggal")) { startIdx = i + 1; break; }
-                            }
-                            for (let i = startIdx; i < jsonRows.length; i++) {
-                                const row = jsonRows[i];
-                                if (row && row[0]) {
-                                    transaksiList.push({
-                                        tanggal: row[0],
-                                        noGr: row[1] || "",
-                                        penerimaan: parseFloat(row[2]) || 0,
-                                        noTiket: row[4] || "",
-                                        pengeluaran: parseFloat(row[5]) || 0,
-                                        keterangan: row[8] || ""
-                                    });
-                                }
-                            }
-                            const id = 'item_' + Math.random().toString(36).substring(2, 9);
-                            newBarangObj[id] = { id, nama: sheetName, asal, ukuran, satuan, transaksi: transaksiList };
-                        }
-                    });
-
-                    if (Object.keys(newBarangObj).length > 0) {
-                        appData.barang = newBarangObj;
-                        saveDataStorage();
-                        alert('Import Excel berhasil!');
-                    }
-                } catch(err) {
-                    alert('Gagal membaca file Excel.');
-                }
-                e.target.value = '';
-            };
-            reader.readAsArrayBuffer(file);
         }
 
         function exportJSON() {
