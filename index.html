@@ -390,7 +390,7 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         let appData = { barang: {} };
-        let openCards = {}; // State untuk melacak panel barang mana saja yang sedang terbuka
+        let openCards = {};
 
         document.addEventListener('DOMContentLoaded', () => {
             setupSidebarEvents();
@@ -403,25 +403,16 @@
             const dataRef = window.fbRef(window.fbDB, 'kartu_stok_data');
             window.fbOnValue(dataRef, (snapshot) => {
                 const val = snapshot.val();
-                if (val) {
+                if (val && val.barang) {
                     appData = val;
                 } else {
-                    appData = {
-                        barang: {
-                            "item_1": {
-                                id: "item_1",
-                                nama: "Pipa Besi 4 inch",
-                                asal: "PT Sumber Baja Mandiri",
-                                ukuran: "4 Inch / 6 Meter",
-                                satuan: "Batang",
-                                transaksi: [
-                                    { tanggal: "2026-10-01", noGr: "GR-001", penerimaan: 50, noTiket: "", pengeluaran: 0, keterangan: "Stok Awal Masuk" },
-                                    { tanggal: "2026-10-05", noGr: "", penerimaan: 0, noTiket: "TKT-012", pengeluaran: 15, keterangan: "Distribusi Proyek A" }
-                                ]
-                            }
-                        }
-                    };
-                    saveDataStorage();
+                    // Jika database firebase kosong, cek localstorage terlebih dahulu agar data tidak hilang
+                    const local = localStorage.getItem('kartu_stok_app_data');
+                    if (local) {
+                        try { appData = JSON.parse(local); } catch(e) { appData = { barang: {} }; }
+                    } else {
+                        appData = { barang: {} };
+                    }
                 }
                 renderAll();
             }, (error) => {
@@ -439,31 +430,36 @@
         }
 
         function saveDataStorage() {
+            // Simpan ke localStorage sebagai cadangan langsung
+            localStorage.setItem('kartu_stok_app_data', JSON.stringify(appData));
+
             if (window.fbDB && window.fbSet && window.fbRef) {
                 window.fbSet(window.fbRef(window.fbDB, 'kartu_stok_data'), appData).catch(err => {
                     console.error("Firebase save error:", err);
-                    localStorage.setItem('kartu_stok_app_data', JSON.stringify(appData));
                 });
-            } else {
-                localStorage.setItem('kartu_stok_app_data', JSON.stringify(appData));
             }
             renderAll();
         }
 
         function loadData() {
+            // Tarik data terbaru dari Firebase atau LocalStorage tanpa mereset ke awal
             if (window.fbDB && window.fbGet && window.fbRef) {
                 window.fbGet(window.fbRef(window.fbDB, 'kartu_stok_data')).then((snapshot) => {
-                    if (snapshot.exists()) {
+                    if (snapshot.exists() && snapshot.val().barang) {
                         appData = snapshot.val();
-                        renderAll();
-                        alert('Data berhasil diperbarui dari Firebase!');
+                    } else {
+                        const local = localStorage.getItem('kartu_stok_app_data');
+                        if (local) appData = JSON.parse(local);
                     }
+                    renderAll();
+                    alert('Data berhasil direload ke versi terbaru!');
                 }).catch(() => {
-                    alert('Gagal mengambil data terbaru.');
+                    loadDataLocalFallback();
+                    alert('Memuat ulang data lokal.');
                 });
             } else {
-                alert('Memuat ulang data lokal.');
-                renderAll();
+                loadDataLocalFallback();
+                alert('Data lokal berhasil direfresh!');
             }
         }
 
@@ -605,7 +601,6 @@
                 cardDiv.className = "bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition";
                 
                 cardDiv.innerHTML = `
-                    <!-- Panel Kecil (Header yang dapat diklik) -->
                     <div onclick="toggleCardDetail('${item.id}')" class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/80 transition">
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-1">
                             <div>
@@ -642,7 +637,6 @@
                         </div>
                     </div>
 
-                    <!-- Rincian & Tabel Transaksi (Muncul saat panel di-klik) -->
                     <div class="${isOpen ? 'block' : 'hidden'} border-t border-slate-100 p-4 sm:p-5 bg-slate-50/50 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Rincian Kartu Stok Harian</span>
@@ -775,7 +769,7 @@
             } else {
                 const id = 'item_' + Date.now();
                 appData.barang[id] = { id, nama, asal, ukuran, satuan, transaksi: [] };
-                openCards[id] = true; // Otomatis buka panel saat baru dibuat
+                openCards[id] = true;
             }
 
             saveDataStorage();
