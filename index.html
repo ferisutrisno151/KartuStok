@@ -133,10 +133,11 @@
                         <i class="fa-solid fa-share-nodes"></i>
                         <span>Share Link Aplikasi</span>
                     </button>
-                    <button onclick="downloadAppHTML()" class="w-full bg-emerald-950 hover:bg-emerald-900 text-emerald-200 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-emerald-800">
-                        <i class="fa-solid fa-code"></i>
-                        <span>Download File HTML Ini</span>
-                    </button>
+                    <!-- TOMBOL DOWNLOAD & INSTALL APK DI SIDEBAR -->
+<button onclick="downloadAPK()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer shadow-lg">
+    <i class="fa-brands fa-android text-base"></i>
+    <span>Download & Install APK</span>
+</button>
                 </div>
             </div>
         </div>
@@ -1245,17 +1246,17 @@
             }
         }
 
-        function downloadAppHTML() {
-            const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "kartu_stok_harian.html";
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        }
+        function downloadAPK() {
+    // Jalur file APK di GitHub Pages Anda
+    const apkUrl = "./StockOpname.apk"; 
+    
+    const a = document.createElement('a');
+    a.href = apkUrl;
+    a.download = "StockOpname.apk";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
         if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
